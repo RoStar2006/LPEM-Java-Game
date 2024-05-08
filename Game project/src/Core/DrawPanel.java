@@ -16,6 +16,7 @@ import java.awt.Graphics;
 public class DrawPanel extends javax.swing.JPanel {
     private MainLogic mainLogic;
     private long lastTime = 0;
+    private final Color bgColor = new Color(0, 0, 0, 128);
     
     /**
      * Creates new form DrawPanel
@@ -38,15 +39,19 @@ public class DrawPanel extends javax.swing.JPanel {
         }
         
         double deltaDrawTime = (System.nanoTime() - lastTime) / Math.pow(10, 9);
-        lastTime = System.nanoTime();
+        long totalHeapSize = (long)(Runtime.getRuntime().totalMemory() / Math.pow(10, 6));
+        long freeHeapSize = (long)(Runtime.getRuntime().freeMemory() / Math.pow(10, 6));
         
-        g.setColor(new Color(0, 0, 0, 128));
-        g.fillRect(0, 0, 60, (int)(g.getFontMetrics().getHeight()*4.5));
+        g.setColor(bgColor);
+        g.fillRect(0, 0, 130, (int)(g.getFontMetrics().getHeight()*5.5));
         g.setColor(Color.ORANGE);
         g.drawString(Math.round(1/deltaDrawTime) + " FPS", 3, g.getFontMetrics().getHeight());
         g.drawString(Math.round(deltaDrawTime*10000)/10.0 + " ms", 3, g.getFontMetrics().getHeight()*2);
         g.drawString(Math.round(1/deltaTime) + " UPS", 3, g.getFontMetrics().getHeight()*3);
         g.drawString(Math.round(deltaTime*10000)/10.0 + " ms", 3, g.getFontMetrics().getHeight()*4);
+        g.drawString("MEM: " + (totalHeapSize-freeHeapSize) + "MB / " + totalHeapSize + "MB", 3, g.getFontMetrics().getHeight()*5);
+        
+        lastTime = System.nanoTime();
     }
 
     /**

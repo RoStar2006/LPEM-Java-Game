@@ -2,6 +2,8 @@ package Core;
 
 
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import javax.swing.Timer;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -15,6 +17,12 @@ import java.awt.Point;
 public class MainFrame extends javax.swing.JFrame {
     private MainLogic mainLogic;
     private GameThread gameThread;
+    private boolean toggleTimerBased = false;
+    
+    // Only added to meet the requirements
+    // It can be switched on and off by pressing F8
+    private Timer drawTimer;
+    private Timer updateTimer;
     
     /**
      * Creates new form MainFrame
@@ -26,6 +34,10 @@ public class MainFrame extends javax.swing.JFrame {
         drawPanel1.setMainLogic(mainLogic);
         
         gameThread = new GameThread(mainLogic, drawPanel1);
+        
+        
+        drawTimer = new Timer(1000/GameThread.FPS, evt -> drawPanel1.repaint());
+        updateTimer = new Timer(1000/GameThread.UPS, evt -> mainLogic.update());
     }
 
     /**
@@ -88,6 +100,18 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
         mainLogic.getControls().keyInput(evt.getKeyCode(), true);
+        if(evt.getKeyCode() == KeyEvent.VK_F8) {
+            toggleTimerBased = !toggleTimerBased;
+            if(toggleTimerBased) {
+                drawTimer.start();
+                updateTimer.start();
+                gameThread.toggleUpdate(!toggleTimerBased);
+            } else {
+                drawTimer.stop();
+                updateTimer.stop();
+                gameThread.toggleUpdate(!toggleTimerBased);
+            }
+        }
     }//GEN-LAST:event_formKeyReleased
 
     private void formMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_formMouseWheelMoved

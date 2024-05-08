@@ -23,14 +23,16 @@ public class GameThread {
     private DrawPanel drawPanel;
     
     private ExecutorService executorService;
+    private boolean useThread = true;
+    
     /**
      * FPS - Frames per second
      */
-    private static int FPS = 60;
+    public static int FPS = 60;
     /**
      * UPS - Updates per second
      */
-    private static int UPS = 100;
+    public static int UPS = 100;
     
     /**
      * The {@link MainLogic} and {@link DrawPanel} are needed for the game loop to work. <br>
@@ -76,28 +78,30 @@ public class GameThread {
         final long delayDrawWait = drawWait - delay;
         
         while(true) {
-            int sleepDelay = 10;
+            int sleepDelay = 100;
             
-            long updateDelta = System.nanoTime() - lastUpdate;
-            if(updateDelta >= updateWait) {
-                mainLogic.update();
-                lastUpdate = System.nanoTime();
-                sleepDelay = 0;
-            } else if(updateDelta >= delayUpdateWait) {
-                sleepDelay = 0;
-            } else {
-                sleepDelay = (int)((delayUpdateWait - updateDelta)/1000000);
-            }
-            
-            long drawDelta = System.nanoTime() - lastDraw;
-            if(drawDelta >= drawWait) {
-                drawPanel.repaint();
-                lastDraw = System.nanoTime();
-                sleepDelay = 0;
-            } else if(drawDelta >= delayDrawWait) {
-                sleepDelay = 0;
-            } else if(sleepDelay != 0) {
-                sleepDelay = Math.min(sleepDelay, (int)((delayDrawWait - drawDelta)/1000000));
+            if(useThread) {
+                long updateDelta = System.nanoTime() - lastUpdate;
+                if(updateDelta >= updateWait) {
+                    mainLogic.update();
+                    lastUpdate = System.nanoTime();
+                    sleepDelay = 0;
+                } else if(updateDelta >= delayUpdateWait) {
+                    sleepDelay = 0;
+                } else {
+                    sleepDelay = (int)((delayUpdateWait - updateDelta)/1000000);
+                }
+
+                long drawDelta = System.nanoTime() - lastDraw;
+                if(drawDelta >= drawWait) {
+                    drawPanel.repaint();
+                    lastDraw = System.nanoTime();
+                    sleepDelay = 0;
+                } else if(drawDelta >= delayDrawWait) {
+                    sleepDelay = 0;
+                } else if(sleepDelay != 0) {
+                    sleepDelay = Math.min(sleepDelay, (int)((delayDrawWait - drawDelta)/1000000));
+                }
             }
             
             if(sleepDelay > 0) {
@@ -108,5 +112,13 @@ public class GameThread {
                 }
             }
         }
+    }
+    
+    /**
+     * Toggles the {@link MainLogic#update()} and {@link DrawPanel#repaint()} calls inside the game loop on and off
+     * @param state 
+     */
+    public void toggleUpdate(boolean state) {
+        useThread = state;
     }
 }

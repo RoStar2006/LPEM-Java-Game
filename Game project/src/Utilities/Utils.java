@@ -182,4 +182,13 @@ public class Utils {
     public static boolean nextBoolean() {
         return RANDOM.nextBoolean();
     }
+    
+    
+    /**
+     * 
+     * @return A random long
+     */
+    public static long nextLong() {
+        return RANDOM.nextLong();
+    }
 }

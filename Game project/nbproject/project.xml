@@ -12,7 +12,9 @@
             </test-roots>
         </data>
         <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>artifacting</word>
             <word>boolean</word>
+            <word>coordiantes</word>
         </spellchecker-wordlist>
     </configuration>
 </project>
