@@ -55,17 +55,28 @@ public class MainFrame extends javax.swing.JFrame {
         setTitle("Java Game");
         setPreferredSize(new java.awt.Dimension(1280, 720));
         setResizable(false);
-        addMouseWheelListener(new java.awt.event.MouseWheelListener() {
-            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
-                formMouseWheelMoved(evt);
-            }
-        });
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 formKeyPressed(evt);
             }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 formKeyReleased(evt);
+            }
+        });
+
+        drawPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                drawPanel1MouseMoved(evt);
+            }
+        });
+        drawPanel1.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                drawPanel1MouseWheelMoved(evt);
+            }
+        });
+        drawPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                drawPanel1MousePressed(evt);
             }
         });
 
@@ -114,9 +125,18 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formKeyReleased
 
-    private void formMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_formMouseWheelMoved
-        mainLogic.getControls().wheelInput(evt.getWheelRotation());
-    }//GEN-LAST:event_formMouseWheelMoved
+    private void drawPanel1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_drawPanel1MouseMoved
+        mainLogic.getControls().mouseMoved(evt);
+    }//GEN-LAST:event_drawPanel1MouseMoved
+
+    private void drawPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_drawPanel1MousePressed
+        mainLogic.getControls().mouseInput(evt, false);
+    }//GEN-LAST:event_drawPanel1MousePressed
+
+    private void drawPanel1MouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_drawPanel1MouseWheelMoved
+        evt.consume();
+        mainLogic.getControls().wheelInput(evt);
+    }//GEN-LAST:event_drawPanel1MouseWheelMoved
 
     /**
      * @param args the command line arguments

@@ -83,8 +83,8 @@ public class GameThread {
             if(useThread) {
                 long updateDelta = System.nanoTime() - lastUpdate;
                 if(updateDelta >= updateWait) {
-                    mainLogic.update();
                     lastUpdate = System.nanoTime();
+                    mainLogic.update();
                     sleepDelay = 0;
                 } else if(updateDelta >= delayUpdateWait) {
                     sleepDelay = 0;
@@ -94,8 +94,8 @@ public class GameThread {
 
                 long drawDelta = System.nanoTime() - lastDraw;
                 if(drawDelta >= drawWait) {
-                    drawPanel.repaint();
                     lastDraw = System.nanoTime();
+                    drawPanel.repaint();
                     sleepDelay = 0;
                 } else if(drawDelta >= delayDrawWait) {
                     sleepDelay = 0;

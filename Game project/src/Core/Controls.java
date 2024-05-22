@@ -4,7 +4,10 @@
  */
 package Core;
 
+import Menus.MenuManager;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 /**
  * This manages all of the game's user inputs, by redirecting the inputs to their correct methods.
@@ -12,13 +15,15 @@ import java.awt.event.KeyEvent;
  */
 public class Controls {
     private Camera camera;
-
+    private MenuManager menuManager;
+    
     /**
      * @param camera 
      * The camera is needed to be able to redirect the mouse and keyboard inputs.
      */
-    public Controls(Camera camera) {
+    public Controls(Camera camera, MenuManager menuManager) {
         this.camera = camera;
+        this.menuManager = menuManager;
     }
     
     /**
@@ -37,11 +42,29 @@ public class Controls {
     }
     
     /**
-     * This manages the mouse wheel inputs.
-     * @param dir 
+     * This manages the mouse wheel inputs. <br>
      * (1) scrolling mouse wheel up (backwards) and (-1) scrolling mouse wheel down (forwards) 
      */
-    public void wheelInput(int dir) {
-        camera.changeZoom(dir);
+    public void wheelInput(MouseWheelEvent evt) {
+        if(!menuManager.mouseWheelInput(evt)) {
+            camera.changeZoom(evt.getWheelRotation());
+        }
+    }
+    
+    /**
+     * This manages the mouse inputs.
+     * @param evt
+     * @param released 
+     * This indicates whether a key is currently being pressed ({@code false}) or released ({@code true}).
+     */
+    public void mouseInput(MouseEvent evt, boolean released) {
+        switch(evt.getButton()) {
+            case MouseEvent.BUTTON1 -> menuManager.mouseClickInput(evt.getPoint().x, evt.getPoint().y, true);
+            case MouseEvent.BUTTON3 -> menuManager.mouseClickInput(evt.getPoint().x, evt.getPoint().y, false);
+        }
+    }
+    
+    public void mouseMoved(MouseEvent evt) {
+        camera.updateMousePos(evt.getX(), evt.getY());
     }
 }

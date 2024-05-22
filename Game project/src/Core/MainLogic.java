@@ -1,7 +1,8 @@
 package Core;
 
 
-import World.Generator;
+import Menus.MenuManager;
+import World.WorldManager;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -19,12 +20,14 @@ import java.util.ArrayList;
  * @author Romeo
  */
 public class MainLogic {
-    private Point screenRes;
+    public static Point SCREEN_RES;
     private long seed = 1;
+    public final static double GAME_SPEED = 1;
     
-    private World world;
     private Camera camera;
     private Controls controls;
+    private WorldManager worldManager;
+    private MenuManager menuManager;
     
     /**
      * Delta time in seconds
@@ -45,13 +48,17 @@ public class MainLogic {
      * @param screenRes This is needed to center the camera to the middle of the screen
      */
     public MainLogic(Point screenRes) {
-        this.screenRes = screenRes;
+        this.SCREEN_RES = screenRes;
         lastTime = System.nanoTime();
         
         camera = new Camera(screenRes.x/2, screenRes.y/2);
-        controls = new Controls(camera);
+        menuManager = new MenuManager(camera);
+        controls = new Controls(camera, menuManager);
         
-        world = Generator.generateWorld(seed, 64, 64);
+        worldManager = new WorldManager(menuManager);
+        worldManager.generateWorld(seed, 256, 256);
+        camera.setPos(worldManager.getCore().getX()+1.5, worldManager.getCore().getY()+1.5);
+        
         generateBorder();
     }
     
@@ -59,20 +66,10 @@ public class MainLogic {
      * This manages the game's physics and other core methods like update(), ...
      */
     public void update() {
-        deltaTime = (System.nanoTime() - lastTime) / Math.pow(10, 9);
+        deltaTime = (System.nanoTime() - lastTime) / Math.pow(10, 9) * MainLogic.GAME_SPEED;
         lastTime = System.nanoTime();
         
-        ArrayList<UpdatedBlock> alUpdatedBlocks = world.getAlUpdateBlocks();
-        for(int i = alUpdatedBlocks.size()-1; i >= 0; i--) {
-            UpdatedBlock updatedBlock = alUpdatedBlocks.get(i);
-            
-            if(updatedBlock == null || updatedBlock.isDeleted()) {
-                alUpdatedBlocks.remove(i);
-                continue;
-            }
-            
-            updatedBlock.update(deltaTime);
-        }
+        worldManager.update(deltaTime);
         
         camera.move();
     }
@@ -83,16 +80,16 @@ public class MainLogic {
      */
     public void draw(Graphics g) {
         camera.updateGraphics(g);
-        
         drawBackground(g);
-        world.draw(camera);
+        
+        worldManager.draw(camera, g);
         
         camera.drawCamera();
     }
     
     private void drawBackground(Graphics g) {
         g.setColor(voidColor);
-        g.fillRect(0, 0, screenRes.x, screenRes.y);
+        g.fillRect(0, 0, SCREEN_RES.x, SCREEN_RES.y);
         
         for(Block border : alBorder) {
             border.draw(camera);
@@ -106,9 +103,10 @@ public class MainLogic {
     private void generateBorder() {
         alBorder = new ArrayList<>();
         
-        for(int i = 1; i <= borderSpacing; i++) {
-            alBorder.add(new Block(-i, -borderSpacing+i-1, Generator.WORLD_SIZE_X+i*2, Generator.WORLD_SIZE_Y+(borderSpacing-i+1)*2, borderColor));
-        }
+        /*for(int i = 1; i <= borderSpacing; i++) {
+            alBorder.add(new Block(-i, -borderSpacing+i-1, WorldManager.WORLD_SIZE_X+i*2, WorldManager.WORLD_SIZE_Y+(borderSpacing-i+1)*2, borderColor));
+        }*/
+        System.err.println("Disabled world border generation");
     }
     
     public static double getDeltaTime() {

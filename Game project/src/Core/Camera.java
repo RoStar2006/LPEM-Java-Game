@@ -5,8 +5,9 @@
 package Core;
 
 import Utilities.Utils;
-import World.Generator;
+import World.WorldManager;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 
 /**
@@ -27,6 +28,7 @@ public class Camera {
     private final double zoomStep = 0.25;
     private final int speed = 200; // px/s
     private final double renderDistanceX, renderDistanceY;
+    private final double fontRatio = WorldManager.FONT_SIZE / (double)WorldManager.BLOCK_SIZE;
     
     /*
         Game Camera
@@ -37,6 +39,8 @@ public class Camera {
     
     private double zoom = 1;
     private double newZoom = 1;
+    
+    private double mouseX, mouseY;
     
     /*
         Drawing camera
@@ -53,6 +57,7 @@ public class Camera {
     private int drawCount = 0;
     private int callCount = 0;
     private long start;
+    private double drawDeltaTime = 0;
 
     /**
      * Initialize the camera with its offset from the top left corner to the middle of the screen in pixels.
@@ -63,8 +68,19 @@ public class Camera {
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         
-        renderDistanceX = xOffset / Generator.BLOCK_SIZE * 1.1;
-        renderDistanceY = yOffset / Generator.BLOCK_SIZE * 1.1;
+        renderDistanceX = xOffset / WorldManager.BLOCK_SIZE * 1.1;
+        renderDistanceY = yOffset / WorldManager.BLOCK_SIZE * 1.1;
+        
+        start = System.nanoTime();
+    }
+    
+    public void setPos(double x, double y) {
+        this.x = x * WorldManager.BLOCK_SIZE;
+        this.y = y * WorldManager.BLOCK_SIZE;
+    }
+    
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
     }
     
     /*
@@ -106,14 +122,14 @@ public class Camera {
         
         if(x < 0) {
             x = Utils.lerpDouble(x, 0, 3*deltaTime);
-        } else if(x > Generator.BLOCK_SIZE * Generator.WORLD_SIZE_X) {
-            x = Utils.lerpDouble(x, Generator.BLOCK_SIZE * Generator.WORLD_SIZE_X, 3*deltaTime);
+        } else if(x > WorldManager.BLOCK_SIZE * WorldManager.WORLD_SIZE_X) {
+            x = Utils.lerpDouble(x, WorldManager.BLOCK_SIZE * WorldManager.WORLD_SIZE_X, 3*deltaTime);
         }
         
         if(y < 0) {
             y = Utils.lerpDouble(y, 0, 3*deltaTime);
-        } else if(y > Generator.BLOCK_SIZE * Generator.WORLD_SIZE_Y) {
-            y = Utils.lerpDouble(y, Generator.BLOCK_SIZE * Generator.WORLD_SIZE_Y, 3*deltaTime);
+        } else if(y > WorldManager.BLOCK_SIZE * WorldManager.WORLD_SIZE_Y) {
+            y = Utils.lerpDouble(y, WorldManager.BLOCK_SIZE * WorldManager.WORLD_SIZE_Y, 3*deltaTime);
         }
     }
     
@@ -144,7 +160,7 @@ public class Camera {
                 newZoom -= zoomStep;
             }
         } else if(scrollDir > 0) {
-            if(newZoom <= 1) {
+            if(newZoom < 1) {
                 newZoom += zoomStep/2;
             } else {
                 newZoom += zoomStep;
@@ -159,7 +175,7 @@ public class Camera {
      * @return The camera's x position in world space
      */
     public int getWorldX() {
-        return (int)Math.ceil(x / Generator.BLOCK_SIZE);
+        return (int)Math.ceil(x / WorldManager.BLOCK_SIZE);
     }
     
     /**
@@ -167,9 +183,9 @@ public class Camera {
      * @return  The camera's y position in world space
      */
     public int getWorldY() {
-        return (int)Math.ceil(y / Generator.BLOCK_SIZE);
+        return (int)Math.ceil(y / WorldManager.BLOCK_SIZE);
     }
-    
+
     /**
      * 
      * @return The camera's x render distance in one direction
@@ -210,9 +226,42 @@ public class Camera {
         return (int)(Math.ceil(value * blockPixelRatio));
     }
     
+    public void updateMousePos(int x, int y) {
+        mouseX = x;
+        mouseY = y;
+    }
+    
+    public double getMouseToWorldPosX() {
+        return Utils.clampDouble(((this.x + (mouseX - xOffset) * zoom) / WorldManager.BLOCK_SIZE), 0, WorldManager.WORLD_SIZE_X-1);
+    }
+    
+    public int getMouseToWorldGridPosX() {
+        return Utils.clampInt((int)(Math.ceil(this.x + (mouseX - xOffset) * zoom) / WorldManager.BLOCK_SIZE), 0, WorldManager.WORLD_SIZE_X-1);
+    }
+    
+    public double getMouseToWorldPosY() {
+        return Utils.clampDouble(((this.y + (mouseY - yOffset) * zoom) / WorldManager.BLOCK_SIZE), 0, WorldManager.WORLD_SIZE_Y-1);
+    }
+    
+    public int getMouseToWorldGridPosY() {
+        return Utils.clampInt((int)(Math.ceil(this.y + (mouseY - yOffset) * zoom) / WorldManager.BLOCK_SIZE), 0, WorldManager.WORLD_SIZE_Y-1);
+    }
+
+    public double getMouseX() {
+        return mouseX;
+    }
+
+    public double getMouseY() {
+        return mouseY;
+    }
+    
     private boolean isOnScreen(double x, double y, double w, double h) {
         return x + w >= cX-cRDX && x <= cX+cRDX && 
                y + h >= cY-cRDY && y <= cY+cRDY;
+    }
+
+    public double getDrawDeltaTime() {
+        return drawDeltaTime;
     }
 
     /**
@@ -225,7 +274,7 @@ public class Camera {
         dZoom = zoom;
         dX = x / dZoom - xOffset;
         dY = y / dZoom - yOffset;
-        blockPixelRatio = Generator.BLOCK_SIZE / dZoom;
+        blockPixelRatio = WorldManager.BLOCK_SIZE / dZoom;
         cX = getWorldX();
         cRDX = getWorldRenderDistanceX();
         cY = getWorldY();
@@ -234,6 +283,8 @@ public class Camera {
                 
         drawCount = 0;
         callCount = 0;
+        
+        drawDeltaTime = (System.nanoTime() - start) / Math.pow(10, 9) * MainLogic.GAME_SPEED;
         start = System.nanoTime();
     }
     
@@ -378,6 +429,45 @@ public class Camera {
         callCount++;
     }
     
+    /**
+     * Draw a string, positioned and scaled from world space into screen space using a custom color. The string is drawn from the top left corner down to the bottom right.
+     * @param str
+     * @param x
+     * @param y
+     * @param color 
+     */
+    public void drawString(String str, double x, double y, Color color) {
+        Font font = g.getFont();
+        g.setFont(font.deriveFont((float)(WorldManager.FONT_SIZE/dZoom)));
+        setColor(color);
+        g.drawString(str, worldToScreenPosX(x), worldToScreenPosY(y + WorldManager.FONT_SIZE / (double)WorldManager.BLOCK_SIZE));
+        g.setFont(font);
+        drawCount++;
+        callCount++;
+    }
+    
+    /**
+     * Draw a string, positioned from world space into screen space using a custom color. The string is drawn from the top left corner down to the bottom right.
+     * @param str
+     * @param x
+     * @param y
+     * @param color 
+     */
+    public void drawRawString(String str, double x, double y, Color color) {
+        Font font = g.getFont();
+        g.setFont(font.deriveFont((float)WorldManager.FONT_SIZE));
+        setColor(color);
+        g.drawString(str, worldToScreenPosX(x), (int)(worldToScreenPosY(y) + WorldManager.FONT_SIZE));
+        g.setFont(font);
+        drawCount++;
+        callCount++;
+    }
+    
+    public void drawRawListString(String str, double x, double y, int number, Color color) {
+        drawRawString(str, x, y + fontRatio * number * zoom, color);
+        callCount++;
+    }
+    
     /*
         Graphics fill wrappers
     */
@@ -482,23 +572,27 @@ public class Camera {
      * Draw some debug stats concerning the camera on-screen and the drawing and game camera pos
      */
     public void drawCamera() {
-        int size = scaleToZoom(20) / Generator.BLOCK_SIZE;
+        int size = scaleToZoom(20) / WorldManager.BLOCK_SIZE;
         g.setColor(Color.GREEN);
         g.fillOval(xOffset-size/2, yOffset-size/2, size, size);
         g.setColor(Color.CYAN);
-        g.fillOval(worldToScreenPosX(x / Generator.BLOCK_SIZE)-size/4, worldToScreenPosY(y / Generator.BLOCK_SIZE)-size/4, size/2, size/2);
+        g.fillOval(worldToScreenPosX(x / WorldManager.BLOCK_SIZE)-size/4, worldToScreenPosY(y / WorldManager.BLOCK_SIZE)-size/4, size/2, size/2);
         g.setColor(Color.BLACK);
         g.drawLine(xOffset, 0, xOffset, yOffset*2);
         g.drawLine(0, yOffset, xOffset*2, yOffset);
         g.setColor(new Color(0, 0, 0, 128));
-        g.fillRect(xOffset*2-100, 0, 100, g.getFontMetrics().getHeight()*6+1);
+        g.fillRect(xOffset*2-100, 0, 100, g.getFontMetrics().getHeight()*8+1);
         
         g.setColor(Color.GREEN);
         g.drawString("Zoom: " + Utils.roundDouble(zoom, 3) + "x", xOffset*2-100, g.getFontMetrics().getHeight());
-        g.drawString("X: " + Utils.roundDouble(x, 3), xOffset*2-100, g.getFontMetrics().getHeight()*2);
-        g.drawString("Y: " + Utils.roundDouble(y, 3), xOffset*2-100, g.getFontMetrics().getHeight()*3);
+        /*g.drawString("X: " + Utils.roundDouble(x, 3), xOffset*2-100, g.getFontMetrics().getHeight()*2);
+        g.drawString("Y: " + Utils.roundDouble(y, 3), xOffset*2-100, g.getFontMetrics().getHeight()*3);*/
+        g.drawString("X: " + getWorldX(), xOffset*2-100, g.getFontMetrics().getHeight()*2);
+        g.drawString("Y: " + getWorldY(), xOffset*2-100, g.getFontMetrics().getHeight()*3);
         g.drawString("D. Calls: " + drawCount, xOffset*2-100, g.getFontMetrics().getHeight()*4);
         g.drawString("M. Calls: " + callCount, xOffset*2-100, g.getFontMetrics().getHeight()*5);
         g.drawString("D. Time: " + Utils.roundDouble((System.nanoTime() - start)/1000000.0, 1) + "ms", xOffset*2-100, g.getFontMetrics().getHeight()*6);
+        g.drawString("Mouse X: " + getMouseToWorldGridPosX(), xOffset*2-100, g.getFontMetrics().getHeight()*7);
+        g.drawString("Mouse Y: " + getMouseToWorldGridPosY(), xOffset*2-100, g.getFontMetrics().getHeight()*8);
     }
 }

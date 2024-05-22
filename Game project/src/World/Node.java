@@ -13,7 +13,8 @@ import java.awt.Color;
 public class Node extends Block {
     
     public Node(int x, int y) {
-        super(x, y, 1, 1, Color.BLACK);
+        super(x, y);
+        initBlock("Node", 0, 1, 1, Color.BLACK);
     }
     
 }

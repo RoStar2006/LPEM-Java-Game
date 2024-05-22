@@ -15,6 +15,9 @@
             <word>artifacting</word>
             <word>boolean</word>
             <word>coordiantes</word>
+            <word>destructions</word>
+            <word>occured</word>
+            <word>whitelist</word>
         </spellchecker-wordlist>
     </configuration>
 </project>
