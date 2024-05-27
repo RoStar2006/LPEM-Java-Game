@@ -4,12 +4,17 @@
  */
 package World;
 
+import Blocks.CopperNode;
+import Blocks.Core;
+import Blocks.IronNode;
+import Blocks.Node;
+import Blocks.UpdatedBlock;
 import Core.Camera;
 import Core.MainLogic;
 import Enemies.EnemyManager;
 import Enemies.SpawnRegion;
 import Menus.MenuManager;
-import Utilities.Utils;
+import Core.Utils;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -54,8 +59,9 @@ public class WorldManager {
                 world.getAlUpdateBlocks().remove(i);
                 continue;
             }
-            
-            updatedBlock.update(deltaTime);
+            if(!updatedBlock.isDestructing() && !updatedBlock.isBuilding()) {   
+                updatedBlock.update(deltaTime, world);
+            }
         }
         
         enemyManager.update(deltaTime, world);
@@ -78,7 +84,7 @@ public class WorldManager {
         }
         
         enemyManager.draw(c);
-        menuManager.draw(c, g);
+        menuManager.draw(g);
         
         drawWaveTimer(g);
     }
@@ -118,8 +124,15 @@ public class WorldManager {
         
         for(int y = 0; y < ySize; y++) {
             for(int x = 0; x < xSize; x++) {
-                if(Utils.nextDouble() <= 0.01) {
-                    Node node = new Node(x, y);
+                if(Utils.nextDouble() <= 0.005) {
+                    Node node;
+                    
+                    if(Utils.nextBoolean()) {
+                        node = new IronNode(x, y);
+                    } else {
+                        node = new CopperNode(x, y);
+                    }
+                    
                     if(world.isAreaFree(node)) {
                         hmNodes.put(new Point(x, y), node);
                     }

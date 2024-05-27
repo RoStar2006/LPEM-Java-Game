@@ -18,8 +18,9 @@ public class Controls {
     private MenuManager menuManager;
     
     /**
-     * @param camera 
      * The camera is needed to be able to redirect the mouse and keyboard inputs.
+     * @param camera 
+     * @param menuManager
      */
     public Controls(Camera camera, MenuManager menuManager) {
         this.camera = camera;
@@ -44,6 +45,7 @@ public class Controls {
     /**
      * This manages the mouse wheel inputs. <br>
      * (1) scrolling mouse wheel up (backwards) and (-1) scrolling mouse wheel down (forwards) 
+     * @param evt
      */
     public void wheelInput(MouseWheelEvent evt) {
         if(!menuManager.mouseWheelInput(evt)) {
@@ -59,8 +61,8 @@ public class Controls {
      */
     public void mouseInput(MouseEvent evt, boolean released) {
         switch(evt.getButton()) {
-            case MouseEvent.BUTTON1 -> menuManager.mouseClickInput(evt.getPoint().x, evt.getPoint().y, true);
-            case MouseEvent.BUTTON3 -> menuManager.mouseClickInput(evt.getPoint().x, evt.getPoint().y, false);
+            case MouseEvent.BUTTON1 -> menuManager.mouseClickInput(evt.getPoint().x, evt.getPoint().y, true, released);
+            case MouseEvent.BUTTON3 -> menuManager.mouseClickInput(evt.getPoint().x, evt.getPoint().y, false, released);
         }
     }
     

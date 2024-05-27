@@ -4,11 +4,14 @@
  */
 package Core;
 
-import Utilities.Utils;
 import World.WorldManager;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.Stroke;
 
 /**
  * This class contains the game and drawing camera. <br>
@@ -49,6 +52,7 @@ public class Camera {
     private double dZoom;
     private double blockPixelRatio = 0;
     private long drawID = 0;
+    private long delayedDrawID = 0;
     
     private int cX, cY;
     private int cRDX, cRDY;
@@ -210,15 +214,23 @@ public class Camera {
         return drawID;
     }
     
+    /**
+     * 
+     * @return The current delayed drawing id
+     */
+    public long getDelayedDrawID() {
+        return delayedDrawID;
+    }
+    
     /*
         Drawing
     */
     
-    private int worldToScreenPosX(double x) {
+    public int worldToScreenPosX(double x) {
         return (int)Math.ceil(x * blockPixelRatio - dX);
     }
     
-    private int worldToScreenPosY(double y) {
+    public int worldToScreenPosY(double y) {
         return (int)Math.ceil(y * blockPixelRatio - dY);
     }
     
@@ -280,6 +292,7 @@ public class Camera {
         cY = getWorldY();
         cRDY = getWorldRenderDistanceY();
         drawID = Utils.nextLong();
+        delayedDrawID = Utils.nextLong();
                 
         drawCount = 0;
         callCount = 0;
@@ -309,7 +322,7 @@ public class Camera {
      * @param y2 
      */
     public void drawLine(double x1, double y1, double x2, double y2) {
-        if(isOnScreen(x, y, x2 - x1, y2 - y1)) {
+        if(isOnScreen(x1, y1, x2 - x1, y2 - y1)) {
             g.drawLine(worldToScreenPosX(x1), worldToScreenPosY(y1), worldToScreenPosX(x2), worldToScreenPosY(y2));
             drawCount++;
         }
@@ -325,9 +338,31 @@ public class Camera {
      * @param color 
      */
     public void drawLine(double x1, double y1, double x2, double y2, Color color) {
-        if(isOnScreen(x, y, x2 - x1, y2 - y1)) {
+        if(isOnScreen(x1, y1, x2 - x1, y2 - y1)) {
             setColor(color);
             g.drawLine(worldToScreenPosX(x1), worldToScreenPosY(y1), worldToScreenPosX(x2), worldToScreenPosY(y2));
+            drawCount++;
+        }
+        callCount++;
+    }
+    
+    /**
+     * Draw a line, positioned and scaled from world space into screen space using a custom color.
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param thickness
+     * @param color 
+     */
+    public void drawLine(double x1, double y1, double x2, double y2, int thickness, Color color) {
+        if(isOnScreen(x1, y1, x2 - x1, y2 - y1)) {
+            setColor(color);
+            Graphics2D g2d = (Graphics2D)g;
+            Stroke oldThickness = g2d.getStroke();
+            g2d.setStroke(new BasicStroke((float)(thickness/dZoom)));
+            g.drawLine(worldToScreenPosX(x1), worldToScreenPosY(y1), worldToScreenPosX(x2), worldToScreenPosY(y2));
+            g2d.setStroke(oldThickness);
             drawCount++;
         }
         callCount++;
@@ -435,15 +470,18 @@ public class Camera {
      * @param x
      * @param y
      * @param color 
+     * @return  The used font
      */
-    public void drawString(String str, double x, double y, Color color) {
-        Font font = g.getFont();
-        g.setFont(font.deriveFont((float)(WorldManager.FONT_SIZE/dZoom)));
+    public Font drawString(String str, double x, double y, Color color) {
+        Font backupFont = g.getFont();
+        Font usedFont = backupFont.deriveFont((float)(WorldManager.FONT_SIZE/dZoom));
+        g.setFont(usedFont);
         setColor(color);
         g.drawString(str, worldToScreenPosX(x), worldToScreenPosY(y + WorldManager.FONT_SIZE / (double)WorldManager.BLOCK_SIZE));
-        g.setFont(font);
+        g.setFont(backupFont);
         drawCount++;
         callCount++;
+        return usedFont;
     }
     
     /**
@@ -452,20 +490,49 @@ public class Camera {
      * @param x
      * @param y
      * @param color 
+     * @return  The used font
      */
-    public void drawRawString(String str, double x, double y, Color color) {
-        Font font = g.getFont();
-        g.setFont(font.deriveFont((float)WorldManager.FONT_SIZE));
+    public Font drawRawString(String str, double x, double y, Color color) {
+        Font backupFont = g.getFont();
+        Font usedFont = backupFont.deriveFont((float)WorldManager.FONT_SIZE);
+        g.setFont(usedFont);
         setColor(color);
         g.drawString(str, worldToScreenPosX(x), (int)(worldToScreenPosY(y) + WorldManager.FONT_SIZE));
-        g.setFont(font);
+        g.setFont(backupFont);
         drawCount++;
         callCount++;
+        return usedFont;
     }
     
-    public void drawRawListString(String str, double x, double y, int number, Color color) {
-        drawRawString(str, x, y + fontRatio * number * zoom, color);
+    /**
+     * Draw a string, positioned from world space into screen space using a custom color. The string is drawn from the top left corner down to the bottom right. <br>
+     * Its y position is offset, so that it is the nth item in a drawn list.
+     * @param str
+     * @param x
+     * @param y
+     * @param number
+     * @param color
+     * @return The used font
+     */
+    public Font drawRawListString(String str, double x, double y, int number, Color color) {
         callCount++;
+        return drawRawString(str, x, y + fontRatio * number * zoom, color);
+    }
+    
+    /**
+     * 
+     * @return The scaled font that would be used for text
+     */
+    public Font getFont() {
+        return g.getFont().deriveFont((float)(WorldManager.FONT_SIZE/dZoom));
+    }
+    
+    /**
+     * 
+     * @return The unscaled "raw" font that would be used for text
+     */
+    public Font getRawFont() {
+        return g.getFont().deriveFont((float)WorldManager.FONT_SIZE);
     }
     
     /*

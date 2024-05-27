@@ -65,6 +65,9 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         drawPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                drawPanel1MouseDragged(evt);
+            }
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 drawPanel1MouseMoved(evt);
             }
@@ -77,6 +80,9 @@ public class MainFrame extends javax.swing.JFrame {
         drawPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 drawPanel1MousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                drawPanel1MouseReleased(evt);
             }
         });
 
@@ -137,6 +143,14 @@ public class MainFrame extends javax.swing.JFrame {
         evt.consume();
         mainLogic.getControls().wheelInput(evt);
     }//GEN-LAST:event_drawPanel1MouseWheelMoved
+
+    private void drawPanel1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_drawPanel1MouseReleased
+        mainLogic.getControls().mouseInput(evt, true);
+    }//GEN-LAST:event_drawPanel1MouseReleased
+
+    private void drawPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_drawPanel1MouseDragged
+        mainLogic.getControls().mouseMoved(evt);
+    }//GEN-LAST:event_drawPanel1MouseDragged
 
     /**
      * @param args the command line arguments

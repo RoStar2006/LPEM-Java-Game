@@ -4,6 +4,8 @@
  */
 package World;
 
+import Blocks.Block;
+
 /**
  *
  * @author Romeo

@@ -17,10 +17,12 @@ public class Inventory {
     private ArrayList<ItemType> alWhitelist = new ArrayList<>();
     private int maxStackSize;
     private int maxSize;
+    private boolean outputOnly;
 
-    public Inventory(int maxStackSize, int maxSize) {
+    public Inventory(int maxStackSize, int maxSize, boolean outputOnly) {
         this.maxStackSize = maxStackSize;
         this.maxSize = maxSize;
+        this.outputOnly = outputOnly;
     }
     
     /**
@@ -105,6 +107,14 @@ public class Inventory {
         return hmItems;
     }
 
+    /**
+     * This method should be called, when an external blocks wants to input items
+     * @return 
+     */
+    public boolean isOutputOnly() {
+        return outputOnly;
+    }
+
     @Override
     public String toString() {
         String result = "";
@@ -122,13 +132,15 @@ public class Inventory {
         
         int i = 0;
         for(Map.Entry<ItemType, Integer> entry : inventory.entrySet()) {
-            strArr[i] = entry.getValue() + "x " + entry.getKey().toString().replaceAll("(?<=[a-z])([A-Z])", " $1"); // Splits the name at capital letters
+            strArr[i] = entry.getValue() + "x " + formatName(entry.getKey()); // Splits the name at capital letters
             i++;
         }
         
         return strArr;
     }
     
-    
+    public static String formatName(ItemType itemType) {
+        return itemType.toString().replaceAll("(?<=[a-z])([A-Z])", " $1");
+    }
     
 }

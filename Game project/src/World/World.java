@@ -4,11 +4,18 @@
  */
 package World;
 
+import Blocks.Core;
+import Blocks.Block;
+import Blocks.BlockType;
+import Blocks.ConveyorBelt;
+import Blocks.Node;
+import Blocks.NodeCollector;
+import Blocks.UpdatedBlock;
 import Core.Camera;
 import Enemies.EnemyManager;
 import Enemies.SpawnRegion;
 import Items.ItemType;
-import Utilities.Utils;
+import Core.Utils;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,6 +100,12 @@ public class World {
                             core.addItem(entry.getKey(), entry.getValue());
                         }
                         
+                        if(block instanceof UpdatedBlock updatedBlock && updatedBlock.hasInventory()) {
+                            for(Map.Entry<ItemType, Integer> entry : updatedBlock.getInventory().entrySet()) {
+                                core.addItem(entry.getKey(), entry.getValue());
+                            }
+                        }
+                        
                         for(int lY = 0; lY < block.getHeight(); lY++) {
                             for(int lX = 0; lX < block.getWidth(); lX++) {
                                 Block lBlock = alBlocks.get(block.getY() + lY).set(block.getX() + lX, null);
@@ -116,7 +129,8 @@ public class World {
      * @param forcePlace 
      */
     public void placeBlock(Block block, boolean forcePlace) {
-        if(isAreaFree(block)) {
+        boolean areaFree = isAreaFree(block);
+        if(areaFree || isReplacable(block)) { // If area is free or replacable
             if(block instanceof UpdatedBlock updatedBlock) {
                 alUpdateBlocks.add(updatedBlock);
             }
@@ -126,10 +140,14 @@ public class World {
                 canPlace = hasEnoughItems(block);
                 
                 if(canPlace) {
+                    if(!areaFree) { // Area not free, so refund it, to replace it
+                        refundBlock(block);
+                    }
+                    
                     for(Map.Entry<ItemType, Integer> entry : block.getHmNeededItems().entrySet()) {
                         core.removeItem(entry.getKey(), entry.getValue());
                     }
-                    
+
                     alPlannedBlocks.add(new PlannedBlock(block, 0));
                     block.damage(block.getMaxHealth()-1, this);
                 }
@@ -144,8 +162,30 @@ public class World {
                         }
                     }
                 }
+
+                if(block instanceof NodeCollector nodeCollector) {
+                    nodeCollector.setNode(getNode(block.getX(), block.getY()));
+                }
             }
         }
+    }
+    
+    private void refundBlock(Block block) {
+        Block lB = getBlock(block.getX(), block.getY());
+        
+        for(Map.Entry<ItemType, Integer> entry : lB.getHmNeededItems().entrySet()) { // refund the old items
+            core.addItem(entry.getKey(), entry.getValue());
+        }
+        
+        if(lB instanceof UpdatedBlock updatedBlock) { // add the inventory to the core
+            if(updatedBlock.hasInventory()) {
+                for(Map.Entry<ItemType, Integer> entry : updatedBlock.getInventory().entrySet()) { // refund the old items
+                    core.addItem(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        
+        removeBlock(block.getX(), block.getY(), false);
     }
     
     /**
@@ -214,9 +254,35 @@ public class World {
         return true;
     }
     
+    public boolean isReplacable(Block block) {
+        if(block.getBlockType() == BlockType.None) { // Block type "None" are not replacable
+            return false;
+        }
+        
+        Block lB = getBlock(block.getX(), block.getY());
+        if(lB == null || lB.getBlockType() != block.getBlockType()) { // Block type not matching
+            return false;
+        }
+        
+        if(lB.getWidth() != block.getWidth() || lB.getHeight() != block.getHeight() || 
+           lB.getX() != block.getX() || lB.getY() != block.getY()) { // Postition and size have to match exactly
+            return false;
+        }
+        
+        if(block instanceof ConveyorBelt cb && lB instanceof ConveyorBelt lCB) { // Conveyor belts have to point in different directions
+            return !cb.getDirection().equals(lCB.getDirection());
+        }
+        
+        return !block.getClass().equals(lB.getClass()); // Block has to be a different class
+    }
+    
     public boolean hasEnoughItems(Block block) {
+        return hasEnoughItems(block, 1);
+    }
+    
+    public boolean hasEnoughItems(Block block, int blockCount) {
         for(Map.Entry<ItemType, Integer> entry : block.getHmNeededItems().entrySet()) {
-            if(!core.containsItems(entry.getKey(), entry.getValue())) {
+            if(!core.containsItems(entry.getKey(), entry.getValue()*blockCount)) {
                 return false;
             }
         }
@@ -265,11 +331,15 @@ public class World {
         return alSpawnRegions;
     }
     
+    private ArrayList<UpdatedBlock> alDelayedDraws = new ArrayList<>();
+    
     public void draw(Camera c) {
         for(Node node : hmNodes.values()) {
             node.draw(c);
         }
-                
+        
+        alDelayedDraws.clear();
+        
         int offset = WorldManager.CHUNK_SIZE / 2;
         int startChunkX = Utils.clampInt((c.getWorldX() - c.getWorldRenderDistanceX()) - offset, 0, xSize);
         int endChunkX = Utils.clampInt(startChunkX + (c.getWorldRenderDistanceX()*2) + offset, 0, xSize);
@@ -282,7 +352,16 @@ public class World {
                 if(b != null) {
                     b.draw(c);
                     x += b.getWidth() - 1;
+                    if(b instanceof UpdatedBlock updatedBlock) {
+                        alDelayedDraws.add(updatedBlock);
+                    }
                 }
+            }
+        }
+        
+        for(UpdatedBlock updatedBlock : alDelayedDraws) {
+            if(updatedBlock != null) {
+                updatedBlock.delayedDraw(c, this);
             }
         }
     }

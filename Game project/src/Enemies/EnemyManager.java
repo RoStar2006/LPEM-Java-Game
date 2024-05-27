@@ -5,8 +5,8 @@
 package Enemies;
 
 import Core.Camera;
-import Utilities.Utils;
-import World.Core;
+import Core.Utils;
+import Blocks.Core;
 import World.World;
 import World.WorldManager;
 import java.util.ArrayList;

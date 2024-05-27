@@ -9,6 +9,7 @@ package Items;
  * @author Romeo
  */
 public enum ItemType {
+    DefaultItem,
     IronOre,
     CopperOre
 }

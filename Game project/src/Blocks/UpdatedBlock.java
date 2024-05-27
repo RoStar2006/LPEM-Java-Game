@@ -2,12 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package World;
+package Blocks;
 
+import Core.Camera;
 import Items.Inventory;
 import Core.MainLogic;
 import Items.ItemType;
-import Utilities.Utils;
+import World.World;
 import java.awt.Color;
 import java.util.HashMap;
 
@@ -15,41 +16,52 @@ import java.util.HashMap;
  *
  * @author Romeo
  */
-public class UpdatedBlock extends Block {
+public abstract class UpdatedBlock extends Block {
     private Inventory inventory;
+    private long delayedDrawID;
     
     public UpdatedBlock(int x, int y) {
         super(x, y);
         initBlock("Updated Block", 0, 1, 1, Color.YELLOW);
     }
     
-    /*
-        Test code
-    */
-    private double waitTime = 1;
-    private double curTime = 0;
-    
     /**
      * This is called every {@link MainLogic#update()} tick and is the core component of an {@link UpdatedBlock}
      * @param deltaTime 
+     * @param world 
      */
-    public void update(double deltaTime) {
-        curTime += deltaTime;
-        
-        if(curTime >= waitTime) {
-            waitTime = Utils.nextDouble(0.2, 0.6);
-            curTime = 0;
-            color = new Color(Utils.nextInt(0, 256), Utils.nextInt(0, 256), Utils.nextInt(0, 256));
+    public abstract void update(double deltaTime, World world);
+    
+    public void delayedDraw(Camera c, World world) {
+        if(checkIfDelayedDrawn(c)) {
+            return;
         }
+        
+        delayedDrawID = c.getDelayedDrawID();
     }
     
-    protected void createInventory(int maxStackSize, int maxSize) {
-        inventory = new Inventory(maxStackSize, maxSize);
+    /**
+     * This checks if a block was already delayed drawn in that frame.
+     * @param c
+     * @return 
+     */
+    protected boolean checkIfDelayedDrawn(Camera c) {
+        return c.getDelayedDrawID() == delayedDrawID;
+    }
+    
+    protected void createInventory(int maxStackSize, int maxSize, boolean outputOnly) {
+        inventory = new Inventory(maxStackSize, maxSize, outputOnly);
     }
     
     protected void setMaxStackSize(int maxStackSize) {
         if(inventory != null) {
             inventory.setMaxStackSize(maxStackSize);
+        }
+    }
+    
+    protected void setMaxSize(int maxSize) {
+        if(inventory != null) {
+            inventory.setMaxSize(maxSize);
         }
     }
     
@@ -60,7 +72,21 @@ public class UpdatedBlock extends Block {
     }
     
     /**
-     * This method accesses the {@link Inventory#addItem(Items.Item, int)} method.
+     * This method accesses the {@link Inventory#addItem(Items.Item, int)} method, however it bypasses the output only.
+     * @see Inventory#addItem(Items.Item, int)
+     * @param itemType
+     * @param quantity
+     * @return The output of the {@link Inventory#addItem(Items.Item, int)} method or -1 if not inventory exists.
+     */
+    protected int forceAddItem(ItemType itemType, int quantity) {
+        if(inventory == null) {
+            return -1;
+        }
+        return inventory.addItem(itemType, quantity);
+    }
+    
+    /**
+     * This method accesses the {@link Inventory#addItem(Items.Item, int)} method. It only adds items if the inventory is not set to output only.
      * @see Inventory#addItem(Items.Item, int)
      * @param itemType
      * @param quantity
@@ -69,6 +95,8 @@ public class UpdatedBlock extends Block {
     public int addItem(ItemType itemType, int quantity) {
         if(inventory == null) {
             return -1;
+        } else if(inventory.isOutputOnly()) {
+            return quantity;
         }
         return inventory.addItem(itemType, quantity);
     }
@@ -101,7 +129,17 @@ public class UpdatedBlock extends Block {
     }
     
     public boolean containsItems(ItemType itemType, int quantity) {
+        if(inventory == null) {
+            return false;
+        }
         return inventory.containsItems(itemType, quantity);
+    }
+    
+    public boolean isOutputOnly() {
+        if(inventory == null || !isActive()) {
+            return true;
+        }
+        return inventory.isOutputOnly();
     }
     
     public HashMap<ItemType, Integer> getInventory() {

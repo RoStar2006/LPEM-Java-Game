@@ -2,10 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package World;
+package Blocks;
 
 import Core.Camera;
 import Items.ItemType;
+import World.World;
+import World.WorldManager;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -20,12 +22,14 @@ public class Block {
     protected int width, height;
     protected Color color;
     private String name = "Block";
-    private ArrayList<Class> alAllowedNodes = new ArrayList<>();
+    private BlockType blockType = BlockType.None;
+    private ArrayList<Class<? extends Node>> alAllowedNodes = new ArrayList<>();
     private double health;
     private double maxHealth;
     private HashMap<ItemType, Integer> hmNeededItems = new HashMap<>();
     
     private long drawID;
+    private boolean ignoreCheck = false;
     private boolean deleted = false;
     private final double healthBarHeight = 5.0 / WorldManager.BLOCK_SIZE;
     
@@ -52,16 +56,21 @@ public class Block {
         drawID = c.getDrawID();
         c.fillRect(x, y, width, height, color);
         
-        if(maxHealth > 0) {
+        /*if(maxHealth > 0) {
             c.fillRect(x, y-healthBarHeight, width, healthBarHeight, Color.GRAY);
             c.fillRect(x, y-healthBarHeight, width * (health/(double)maxHealth), healthBarHeight, Color.RED);
-        }
+        }*/
         
         if(isDestructing) {
             drawDestructOverlay(c);
         } else if(isBuilding) {
             drawBuildingOverlay(c);
         }
+    }
+    
+    public void draw(Camera c, boolean ignoreCheck) {
+        this.ignoreCheck = ignoreCheck;
+        draw(c);
     }
     
     public void drawBuildingOverlay(Camera c) {
@@ -141,6 +150,14 @@ public class Block {
         this.x = x;
         this.y = y;
     }
+
+    protected void setName(String name) {
+        this.name = name;
+    }
+
+    protected void setBlockType(BlockType blockType) {
+        this.blockType = blockType;
+    }
     
     /**
      * 
@@ -148,7 +165,12 @@ public class Block {
      * @return Returns a boolean indicating if this block can be placed on another block.
      */
     public boolean isPlacableOn(Block block) {
-        return alAllowedNodes.contains(block.getClass());
+        for(Class<? extends Node> c : alAllowedNodes) {
+            if(c.isAssignableFrom(block.getClass())) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public boolean isNodesOnly() {
@@ -161,6 +183,10 @@ public class Block {
      * @return 
      */
     protected boolean checkIfDrawn(Camera c) {
+        if(ignoreCheck) {
+            ignoreCheck = false;
+            return false;
+        }
         return c.getDrawID() == drawID;
     }
     
@@ -179,9 +205,17 @@ public class Block {
     public boolean isDestructing() {
         return isDestructing;
     }
+
+    public boolean isBuilding() {
+        return isBuilding;
+    }
     
     public boolean isDeleted() {
         return deleted;
+    }
+    
+    public boolean isActive() {
+        return !deleted && !isDestructing && !isBuilding;
     }
     
     public int getX() {
@@ -214,5 +248,9 @@ public class Block {
 
     public HashMap<ItemType, Integer> getHmNeededItems() {
         return hmNeededItems;
+    }
+
+    public BlockType getBlockType() {
+        return blockType;
     }
 }
