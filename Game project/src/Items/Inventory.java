@@ -92,7 +92,6 @@ public class Inventory {
     
     public void addWhitelist(ItemType itemType) {
         alWhitelist.add(itemType);
-        hmItems.put(itemType, 0);
     }
 
     public void setMaxStackSize(int maxStackSize) {

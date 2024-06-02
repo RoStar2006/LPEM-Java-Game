@@ -10,6 +10,7 @@ import Core.MainLogic;
 import Items.ItemType;
 import World.World;
 import java.awt.Color;
+import java.awt.Point;
 import java.util.HashMap;
 
 /**
@@ -19,6 +20,8 @@ import java.util.HashMap;
 public abstract class UpdatedBlock extends Block {
     private Inventory inventory;
     private long delayedDrawID;
+    private Point direction = null;
+    private boolean exitArrowStyle = true;
     
     public UpdatedBlock(int x, int y) {
         super(x, y);
@@ -38,6 +41,35 @@ public abstract class UpdatedBlock extends Block {
         }
         
         delayedDrawID = c.getDelayedDrawID();
+    }
+    
+    /**
+     * This method returns an {@link UpdatedBlock} if items can be put into it. If not, then it returns null
+     * @param world
+     * @param offsetX
+     * @param offsetY
+     * @return
+     */
+    protected UpdatedBlock getInputBlock(World world, int offsetX, int offsetY) {
+        if(Math.abs(offsetX) != Math.abs(offsetY)) { // Not the corners or the center
+            Block block = world.getBlock(x+offsetX, y+offsetY);
+
+            if(block instanceof UpdatedBlock updatedBlock && !updatedBlock.isOutputOnly() && block.isActive()) { // Check if input is allowed and block is ready
+                if(updatedBlock instanceof ConveyorBelt conveyorBelt) { // Check if the conveyor belt is facing into the block
+                    if(!(conveyorBelt.getDirection().x == -offsetX && conveyorBelt.getDirection().y == -offsetY)) {
+                        return updatedBlock;
+                    }
+                } else if(updatedBlock instanceof Splitter splitter) { // Check if the splitter input is facing the block
+                    if(splitter.getDirection().x == offsetX && splitter.getDirection().y == offsetY) {
+                        return updatedBlock;
+                    }
+                } else {
+                    return updatedBlock;
+                }
+            }
+        }        
+        
+        return null;
     }
     
     /**
@@ -151,6 +183,26 @@ public abstract class UpdatedBlock extends Block {
     
     public boolean hasInventory() {
         return inventory != null;
+    }
+    
+    public void setDirection(Point direction) {
+        this.direction = direction;
+    }
+
+    public Point getDirection() {
+        return direction;
+    }
+    
+    public boolean hasDirection() {
+        return direction != null;
+    }
+
+    public boolean isExitArrowStyle() {
+        return exitArrowStyle;
+    }
+
+    public void setExitArrowStyle(boolean exitArrowStyle) {
+        this.exitArrowStyle = exitArrowStyle;
     }
     
 }

@@ -7,8 +7,8 @@ package Enemies;
 import Core.Camera;
 import Blocks.Block;
 import Blocks.Core;
+import Core.StatsManager;
 import World.World;
-import World.WorldManager;
 import java.awt.Color;
 
 /**
@@ -20,13 +20,11 @@ public class Enemy {
     /**
      * blocks per second
      */
-    private int speed = 7;
+    private int speed;
     private Core core;
-    private double size = 0.5;
-    private double range = 7;
-    private double damage = 1;
-    private double attackSpeed = 0.75;
-    private double curAttackCooldown = attackSpeed;
+    private double size;
+    private double range;
+    private StatsManager statsManager;
     
     private double xDir, yDir;
 
@@ -35,7 +33,19 @@ public class Enemy {
         this.y = y;
         this.core = core;
         
+        statsManager = new StatsManager(10);
+        statsManager.setEnemy(this);
+        
+        initEnemy(10, 1, 0.75, 1, 0.5, 7);
+        
         calcDir();
+    }
+    
+    protected void initEnemy(double maxHealth, double damage, double attackSpeed, double range, double size, int speed) {
+        statsManager.init(maxHealth, damage, attackSpeed);
+        this.speed = speed;
+        this.range = range;
+        this.size = size;
     }
     
     public void move(double deltaTime, World w) {
@@ -48,17 +58,11 @@ public class Enemy {
         } 
         
         if(fB != null) {
-            curAttackCooldown -= deltaTime;
-            if(curAttackCooldown <= 0) {
-                curAttackCooldown += attackSpeed;
-                fB.damage(damage, w);
-            }
+            statsManager.update(deltaTime);
+            statsManager.doDamage(fB.getStatsManager(), w);
         } else if(rB != null) {
-            curAttackCooldown -= deltaTime;
-            if(curAttackCooldown <= 0) {
-                curAttackCooldown += attackSpeed;
-                rB.damage(damage, w);
-            }
+            statsManager.update(deltaTime);
+            statsManager.doDamage(rB.getStatsManager(), w);
         }
     }
     
@@ -72,7 +76,7 @@ public class Enemy {
         double lX = x + xDir;
         double lY = y + yDir;
         
-        for(int i = 0; i <= range; i++) {
+        for(int i = 0; i < range; i++) {
             Block block = world.getBlock((int)Math.round(lX + i * Math.signum(xDir)), (int)Math.round(lY + i * Math.signum(yDir)));
             if(block != null) {
                 return block;
@@ -86,12 +90,12 @@ public class Enemy {
         Block result = null;
         double smallestDist = -1;
         int x1 = (int)Math.floor(x + size - range);
-        int x2 = (int)Math.ceil(x1 + range*2);
+        int x2 = (int)Math.ceil(x + size + range);
         int y1 = (int)Math.floor(y + size - range);
-        int y2 = (int)Math.ceil(y1 + range*2);
+        int y2 = (int)Math.ceil(x + size + range);
         
-        for(int x = x1; x <= x2; x++) {
-            for(int y = y1; y <= y2; y++) {
+        for(int x = x1; x < x2; x++) {
+            for(int y = y1; y < y2; y++) {
                 Block block = world.getBlock(x, y);
                 
                 if(block != null) {
@@ -118,21 +122,39 @@ public class Enemy {
         return (int)Math.round(x);
     }
     
+    public double getCenterX() {
+        return x + size;
+    }
+    
     public int getY() {
         return (int)Math.round(y);
+    }
+    
+    public double getCenterY() {
+        return y + size;
     }
     
     public int getSize() {
         return (int)Math.ceil(size);
     }
     
+    public double getRadius() {
+        return size/2.0;
+    }
+
+    public StatsManager getStatsManager() {
+        return statsManager;
+    }
+    
     public void draw(Camera c) {
         // Enemy debug
-//        c.drawRect(x + size - range, y + size - range, range*2, range*2, Color.CYAN); // range
+        // c.drawRect((int)Math.floor(x + size - range), (int)Math.floor(y + size - range), (int)Math.ceil(x + size + range)-(int)Math.floor(x + size - range), (int)Math.ceil(y + size + range)-(int)Math.floor(y + size - range), Color.CYAN); // range block perfect
+        // c.drawRect(x + size - range, y + size - range, range*2, range*2, Color.CYAN); // range
 //        for(int i = 0; i < range; i++) { // blocks in front
 //            c.drawRect((int)Math.round(x + xDir + i * Math.signum(xDir)), (int)Math.round(y + yDir + i * Math.signum(yDir)), 1, 1, Color.yellow);
 //        }
         // c.drawRect(Math.round(x) - WorldManager.ENEMY_BUILD_DIST, Math.round(y) - WorldManager.ENEMY_BUILD_DIST, WorldManager.ENEMY_BUILD_DIST*2+1, WorldManager.ENEMY_BUILD_DIST*2+1, Color.yellow); // Forbidden build area
+        // c.drawRect(x + size/2, y + size/2, size, size, Color.GREEN); // Draw a square around the enemy
         c.fillCircle(x + size/2, y + size/2, size, Color.RED);
     }
     

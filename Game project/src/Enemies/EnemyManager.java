@@ -30,7 +30,11 @@ public class EnemyManager {
         
         for(int i = alEnemies.size()-1; i >= 0; i--) {
             Enemy enemy = alEnemies.get(i);
-            enemy.move(deltaTime, world);
+            if(enemy.getStatsManager().isDead()) {
+                alEnemies.remove(i);
+            } else {
+                enemy.move(deltaTime, world);
+            }
         }
     }
     
@@ -41,18 +45,54 @@ public class EnemyManager {
         
         for(SpawnRegion spawnRegion : alSpawnRegions) {
             for(int i = 0; i < Utils.nextInt(3, 10); i++) {
-                Enemy enemy = new Enemy(spawnRegion.getSpawnX(), spawnRegion.getSpawnY(), core);
+                Enemy enemy = new Enemy(spawnRegion.getRandomSpawnX(), spawnRegion.getRandomSpawnY(), core);
                 alPlannedEnemies.add(new PlannedEnemy(enemy, i*0.2));
             }
         }
     }
-
-    public void setAlSpawnRegions(ArrayList<SpawnRegion> alSpawnRegions) {
-        this.alSpawnRegions = alSpawnRegions;
+    
+    public Enemy getNearestEnemy(double x, double y, double range) {
+        Enemy result = null;
+        double minDistance = Double.POSITIVE_INFINITY;
+        for(Enemy enemy : alEnemies) {
+            if(!enemy.getStatsManager().isDead()) {
+                double d = Math.sqrt(Math.pow(x-enemy.getX(), 2) + Math.pow(y-enemy.getY(), 2));
+                if(d <= range && d < minDistance) {
+                    minDistance = d;
+                    result = enemy;
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    public ArrayList<Enemy> getNearestEnemyList(double x, double y, double range) {
+        ArrayList<Enemy> result = new ArrayList<>();
+        ArrayList<Double> alDistances = new ArrayList<>();
+        
+        for(Enemy enemy : alEnemies) {
+            if(!enemy.getStatsManager().isDead()) {
+                double d = Math.sqrt(Math.pow(x-enemy.getX(), 2) + Math.pow(y-enemy.getY(), 2));
+                if(d <= range) {
+                    int j = 0;
+                    for(; j < alDistances.size(); j++) {
+                        if(d <= alDistances.get(j)) {
+                            break;
+                        }
+                    }
+                    alDistances.add(j, d);
+                    result.add(j, enemy);
+                }
+            }
+        }
+        
+        return result;
     }
     
     public boolean isEnemyOnPos(int x, int y) {
-        for(Enemy enemy : alEnemies) {
+        for(int i = alEnemies.size()-1; i >= 0; i--) {
+            Enemy enemy = alEnemies.get(i);
             if(enemy.getX() >= x - WorldManager.ENEMY_BUILD_DIST && enemy.getX() + enemy.getSize() <= x+1 + WorldManager.ENEMY_BUILD_DIST && 
                 enemy.getY() >= y - WorldManager.ENEMY_BUILD_DIST && enemy.getY() + enemy.getSize() <= y+1 + WorldManager.ENEMY_BUILD_DIST ) {
                 return true;
@@ -60,6 +100,14 @@ public class EnemyManager {
         }
         
         return false;
+    }
+
+    public ArrayList<Enemy> getAlEnemies() {
+        return alEnemies;
+    }
+
+    public void setAlSpawnRegions(ArrayList<SpawnRegion> alSpawnRegions) {
+        this.alSpawnRegions = alSpawnRegions;
     }
     
     public void draw(Camera c) {

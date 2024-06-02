@@ -43,13 +43,14 @@ public class DrawPanel extends javax.swing.JPanel {
         long freeHeapSize = (long)(Runtime.getRuntime().freeMemory() / Math.pow(10, 6));
         
         g.setColor(bgColor);
-        g.fillRect(0, 0, 130, (int)(g.getFontMetrics().getHeight()*5.5));
+        g.fillRect(0, 0, 130, (int)(g.getFontMetrics().getHeight()*6.5));
         g.setColor(Color.ORANGE);
         g.drawString(Math.round(1/deltaDrawTime) + " FPS", 3, g.getFontMetrics().getHeight());
         g.drawString(Math.round(deltaDrawTime*10000)/10.0 + " ms", 3, g.getFontMetrics().getHeight()*2);
         g.drawString(Math.round(1/deltaTime) + " UPS", 3, g.getFontMetrics().getHeight()*3);
         g.drawString(Math.round(deltaTime*10000)/10.0 + " ms", 3, g.getFontMetrics().getHeight()*4);
-        g.drawString("MEM: " + (totalHeapSize-freeHeapSize) + "MB / " + totalHeapSize + "MB", 3, g.getFontMetrics().getHeight()*5);
+        g.drawString("Speed: " + MainLogic.GAME_SPEED + "x", 3, g.getFontMetrics().getHeight()*5);
+        g.drawString("MEM: " + (totalHeapSize-freeHeapSize) + "MB / " + totalHeapSize + "MB", 3, g.getFontMetrics().getHeight()*6);
         
         lastTime = System.nanoTime();
     }

@@ -16,6 +16,7 @@ import Enemies.EnemyManager;
 import Enemies.SpawnRegion;
 import Items.ItemType;
 import Core.Utils;
+import Projectiles.ProjectileManager;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +43,11 @@ public class World {
      */
     private ArrayList<UpdatedBlock> alUpdateBlocks;
     
+    /**
+     * The blocks whose {@link UpdatedBlock#delayedDraw(Core.Camera, World.World)} should be called
+     */
+    private ArrayList<UpdatedBlock> alDelayedDraws = new ArrayList<>();
+    
     private ArrayList<PlannedBlock> alPlannedBlocks;
     
     /**
@@ -51,17 +57,20 @@ public class World {
     
     private ArrayList<SpawnRegion> alSpawnRegions;
     private EnemyManager enemyManager;
+    private ProjectileManager projectileManager;
     private Core core;
 
-    public World(HashMap<Point, Node> hmNodes, int xSize, int ySize, EnemyManager enemyManager) {
+    public World(int xSize, int ySize, HashMap<Point, Node> hmNodes, ArrayList<SpawnRegion> alSpawnRegions, EnemyManager enemyManager, ProjectileManager projectileManager) {
         this.hmNodes = hmNodes;
         this.alBlocks = new ArrayList<>();
         this.alUpdateBlocks = new ArrayList<>();
         this.alSpawnRegions = new ArrayList<>();
         this.alPlannedBlocks = new ArrayList<>();
+        this.alSpawnRegions = alSpawnRegions;
         this.xSize = xSize;
         this.ySize = ySize;
         this.enemyManager = enemyManager;
+        this.projectileManager = projectileManager;
         
         ArrayList<Block> tempAl = new ArrayList<>();
         for(int x = 0; x < xSize; x++) {
@@ -124,6 +133,22 @@ public class World {
     }
     
     /**
+     * This method updates all the blocks in the {@link #alUpdateBlocks} list
+     * @param deltaTime
+     */
+    public void updateBlocks(double deltaTime) {
+        for(int i = alUpdateBlocks.size()-1; i >= 0; i--) {
+            UpdatedBlock updatedBlock = alUpdateBlocks.get(i);
+            
+            if(updatedBlock == null || updatedBlock.isDeleted()) {
+                alUpdateBlocks.remove(i);
+            } else if(updatedBlock.isActive()) {
+                updatedBlock.update(deltaTime, this);
+            }
+        }
+    }
+    
+    /**
      * This places a block on its desired position, if that area is free.
      * @param block 
      * @param forcePlace 
@@ -149,7 +174,7 @@ public class World {
                     }
 
                     alPlannedBlocks.add(new PlannedBlock(block, 0));
-                    block.damage(block.getMaxHealth()-1, this);
+                    block.getStatsManager().takeDamage(block.getStatsManager().getMaxHealth()-1, this);
                 }
             }
             
@@ -236,11 +261,11 @@ public class World {
         }
         
         Point p = new Point();
-        Node node = null;
+        
         for(int y = 0; y < block.getHeight(); y++) {
             for(int x = 0; x < block.getWidth(); x++) {
                 p.setLocation(block.getX() + x, block.getY() + y);
-                node = hmNodes.getOrDefault(p, null);
+                Node node = hmNodes.getOrDefault(p, null);
                 if( getBlock(p.x, p.y) != null ||
                     inSpawnRegion(block) ||
                     (block.isNodesOnly() && (node == null || !block.isPlacableOn(node))) ||
@@ -269,17 +294,32 @@ public class World {
             return false;
         }
         
-        if(block instanceof ConveyorBelt cb && lB instanceof ConveyorBelt lCB) { // Conveyor belts have to point in different directions
-            return !cb.getDirection().equals(lCB.getDirection());
+        if(block instanceof UpdatedBlock ub && ub.hasDirection() && lB instanceof UpdatedBlock lUB && lUB.hasDirection()) { // Blocks with directions have to point in different directions
+            if(!block.getClass().equals(lB.getClass())) { // Different block class
+                return true;
+            } else { // Check in which direction they are pointing
+                return !ub.getDirection().equals(lUB.getDirection());
+            }
         }
         
         return !block.getClass().equals(lB.getClass()); // Block has to be a different class
     }
     
+    /**
+     * Check if the {@link #core} has enough items to build a given structure once
+     * @param block
+     * @return 
+     */
     public boolean hasEnoughItems(Block block) {
         return hasEnoughItems(block, 1);
     }
     
+    /**
+     * Check if the {@link #core} has enough items to build a given structure n times
+     * @param block
+     * @param blockCount
+     * @return 
+     */
     public boolean hasEnoughItems(Block block, int blockCount) {
         for(Map.Entry<ItemType, Integer> entry : block.getHmNeededItems().entrySet()) {
             if(!core.containsItems(entry.getKey(), entry.getValue()*blockCount)) {
@@ -302,16 +342,17 @@ public class World {
         
         return false;
     }
-    
-    public void addSpawnRegion(SpawnRegion spawnRegion) {
-        alSpawnRegions.add(spawnRegion);
-    }
 
     public void setCore(Core core) {
         this.core = core;
     }
 
     public Block getBlock(int x, int y) {
+        if( x < 0 || x >= WorldManager.WORLD_SIZE_X ||
+            y < 0 || y >= WorldManager.WORLD_SIZE_Y) {
+            return null;
+        }
+        
         return alBlocks.get(y).get(x);
     }
     
@@ -322,24 +363,23 @@ public class World {
     public Core getCore() {
         return core;
     }
-    
-    public ArrayList<UpdatedBlock> getAlUpdateBlocks() {
-        return alUpdateBlocks;
+
+    public EnemyManager getEnemyManager() {
+        return enemyManager;
     }
 
-    public ArrayList<SpawnRegion> getAlSpawnRegions() {
-        return alSpawnRegions;
+    public ProjectileManager getProjectileManager() {
+        return projectileManager;
     }
     
-    private ArrayList<UpdatedBlock> alDelayedDraws = new ArrayList<>();
-    
     public void draw(Camera c) {
-        for(Node node : hmNodes.values()) {
+        for(Node node : hmNodes.values()) { // Draw the nodes
             node.draw(c);
         }
         
         alDelayedDraws.clear();
         
+        // Draw all the player placed blocks, but only those in render distance
         int offset = WorldManager.CHUNK_SIZE / 2;
         int startChunkX = Utils.clampInt((c.getWorldX() - c.getWorldRenderDistanceX()) - offset, 0, xSize);
         int endChunkX = Utils.clampInt(startChunkX + (c.getWorldRenderDistanceX()*2) + offset, 0, xSize);
@@ -359,10 +399,16 @@ public class World {
             }
         }
         
+        // Execute all the delayed draw of the blocks in the render distance
         for(UpdatedBlock updatedBlock : alDelayedDraws) {
             if(updatedBlock != null) {
                 updatedBlock.delayedDraw(c, this);
             }
+        }
+        
+        // Draw the spawn region
+        for(SpawnRegion spawnRegion : alSpawnRegions) {
+            spawnRegion.draw(c);
         }
     }
     

@@ -15,10 +15,12 @@ import Enemies.EnemyManager;
 import Enemies.SpawnRegion;
 import Menus.MenuManager;
 import Core.Utils;
+import Projectiles.ProjectileManager;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -35,7 +37,9 @@ public class WorldManager {
     
     private World world;
     private EnemyManager enemyManager;
+    private ProjectileManager projectileManager;
     private MenuManager menuManager;
+    private BuildManager buildManager;
     
     private double nextWave = 1; // seconds
 
@@ -51,19 +55,9 @@ public class WorldManager {
         nextWave -= deltaTime;
         
         world.updatePlannedBlocks(deltaTime);
+        world.updateBlocks(deltaTime);
         
-        for(int i = world.getAlUpdateBlocks().size()-1; i >= 0; i--) {
-            UpdatedBlock updatedBlock = world.getAlUpdateBlocks().get(i);
-            
-            if(updatedBlock == null || updatedBlock.isDeleted()) {
-                world.getAlUpdateBlocks().remove(i);
-                continue;
-            }
-            if(!updatedBlock.isDestructing() && !updatedBlock.isBuilding()) {   
-                updatedBlock.update(deltaTime, world);
-            }
-        }
-        
+        projectileManager.update(deltaTime, world);
         enemyManager.update(deltaTime, world);
         
         if(nextWave <= 0) {
@@ -79,10 +73,7 @@ public class WorldManager {
         
         world.draw(c);
         
-        for(SpawnRegion spawnRegion : world.getAlSpawnRegions()) {
-            spawnRegion.draw(c);
-        }
-        
+        projectileManager.draw(c);
         enemyManager.draw(c);
         menuManager.draw(g);
         
@@ -114,9 +105,13 @@ public class WorldManager {
         WORLD_SIZE_Y = ySize;
         
         HashMap<Point, Node> hmNodes = new HashMap<>();
+        ArrayList<SpawnRegion> alSpawnRegions = new ArrayList<>();
         enemyManager = new EnemyManager();
-        world = new World(hmNodes, xSize, ySize, enemyManager);
-        menuManager.setWorld(world);
+        projectileManager = new ProjectileManager();
+        
+        world = new World(xSize, ySize, hmNodes, alSpawnRegions, enemyManager, projectileManager);
+        buildManager = new BuildManager(world);
+        menuManager.init(buildManager, world);
         
         Core core = new Core(Utils.nextInt(xSize/5*2, xSize/5*3), Utils.nextInt(ySize/5*2, ySize/5*3));
         world.placeBlock(core, true);
@@ -146,7 +141,7 @@ public class WorldManager {
             int x = (spawnRight) ? xSize-SPAWN_REGION_SIZE : 0;
             int y = (spawnBottom) ? ySize-SPAWN_REGION_SIZE : 0;
             SpawnRegion spawnRegion = new SpawnRegion(x, y, SPAWN_REGION_SIZE);
-            world.addSpawnRegion(spawnRegion);
+            alSpawnRegions.add(spawnRegion);
             
             if(Utils.nextBoolean()) {   
                 spawnRight = !spawnRight;
@@ -154,6 +149,7 @@ public class WorldManager {
                 spawnBottom = !spawnBottom;
             }
         }
-        enemyManager.setAlSpawnRegions(world.getAlSpawnRegions());
+        
+        enemyManager.setAlSpawnRegions(alSpawnRegions);
     }
 }

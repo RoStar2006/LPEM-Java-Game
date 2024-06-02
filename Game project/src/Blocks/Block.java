@@ -5,6 +5,7 @@
 package Blocks;
 
 import Core.Camera;
+import Core.StatsManager;
 import Items.ItemType;
 import World.World;
 import World.WorldManager;
@@ -21,11 +22,10 @@ public class Block {
     protected int x, y;
     protected int width, height;
     protected Color color;
+    protected StatsManager statsManager;
     private String name = "Block";
     private BlockType blockType = BlockType.None;
     private ArrayList<Class<? extends Node>> alAllowedNodes = new ArrayList<>();
-    private double health;
-    private double maxHealth;
     private HashMap<ItemType, Integer> hmNeededItems = new HashMap<>();
     
     private long drawID;
@@ -46,7 +46,13 @@ public class Block {
         this.width = 1;
         this.height = 1;
         this.color = Color.MAGENTA;
+        statsManager = new StatsManager(0);
+        statsManager.setBlock(this);
     }
+    
+    /*
+        Draw methods
+    */
     
     public void draw(Camera c) {
         if(checkIfDrawn(c)) {
@@ -55,10 +61,11 @@ public class Block {
         
         drawID = c.getDrawID();
         c.fillRect(x, y, width, height, color);
+        c.drawRect(x, y, width, height, Color.BLACK);
         
-        /*if(maxHealth > 0) {
+        /*if(statsManager.getMaxHealth() > 0) {
             c.fillRect(x, y-healthBarHeight, width, healthBarHeight, Color.GRAY);
-            c.fillRect(x, y-healthBarHeight, width * (health/(double)maxHealth), healthBarHeight, Color.RED);
+            c.fillRect(x, y-healthBarHeight, width * (statsManager.getHealth()/(double)statsManager.getMaxHealth()), healthBarHeight, Color.RED);
         }*/
         
         if(isDestructing) {
@@ -94,22 +101,7 @@ public class Block {
         g.fillRect(x, y+size/2, size/2, size/2);
     }
     
-    public void damage(double amount, World world) {
-        health -= amount;
-        
-        if(health <= 0) {
-            health = 0;
-            world.removeBlock(x, y, false);
-        }
-    }
-    
-    public void regenerate(double amount) {
-        health += amount;
-        
-        if(health > maxHealth) {
-            health = maxHealth;
-        }
-    }
+    public void drawHovered(Camera c) {}
     
     /**
      * This need to be called if a block is being deleted 
@@ -128,8 +120,8 @@ public class Block {
     
     protected void initBlock(String name, double maxHealth, int width, int height, Color color) {
         this.name = name;
-        this.maxHealth = maxHealth;
-        this.health = maxHealth;
+        statsManager.init(maxHealth);
+        statsManager.setBlock(this);
         this.height = height;
         this.width = width;
         this.color = color;
@@ -140,6 +132,10 @@ public class Block {
             hmNeededItems.put(itemType, quantity);
         }
     }
+    
+    /*
+        Getters & Setters
+    */
     
     /**
      * This method should only be used by the menu manager, to either draw a preview block or place a block!
@@ -221,9 +217,17 @@ public class Block {
     public int getX() {
         return x;
     }
+    
+    public double getCenterX() {
+        return x + width/2.0;
+    }
 
     public int getY() {
         return y;
+    }
+    
+    public double getCenterY() {
+        return y + height/2.0;
     }
 
     public int getWidth() {
@@ -242,8 +246,8 @@ public class Block {
         return name;
     }
 
-    public double getMaxHealth() {
-        return maxHealth;
+    public StatsManager getStatsManager() {
+        return statsManager;
     }
 
     public HashMap<ItemType, Integer> getHmNeededItems() {

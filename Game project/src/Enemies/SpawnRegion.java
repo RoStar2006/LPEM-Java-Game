@@ -5,6 +5,7 @@
 package Enemies;
 
 import Core.Camera;
+import Core.Utils;
 import java.awt.Color;
 
 /**
@@ -30,6 +31,10 @@ public class SpawnRegion {
     public int getSpawnX() {
         return x + size/2;
     }
+    
+    public int getRandomSpawnX() {
+        return Utils.nextInt(x, x+size);
+    }
 
     public int getY() {
         return y;
@@ -37,6 +42,10 @@ public class SpawnRegion {
     
     public int getSpawnY() {
         return y + size/2;
+    }
+    
+    public int getRandomSpawnY() {
+        return Utils.nextInt(y, y+size);
     }
 
     public int getSize() {

@@ -10,7 +10,8 @@ package Blocks;
  */
 public enum BlockType {
     None,
-    ConveyorBelt,
+    ItemLogistic,
     NodeCollector,
     Wall,
+    Tower
 }

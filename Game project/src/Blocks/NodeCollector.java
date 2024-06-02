@@ -46,17 +46,13 @@ public class NodeCollector extends UpdatedBlock {
         if(!getInventory().isEmpty()) {
             for(int lX = -1; lX <= 1; lX++) {
                 for(int lY = -1; lY <= 1; lY++) {
-                    if(Math.abs(lX) != Math.abs(lY)) { // not the corners or the center
-                        Block block = world.getBlock(x+lX, y+lY);
+                    UpdatedBlock updatedBlock = getInputBlock(world, lX, lY);
 
-                        if(block instanceof UpdatedBlock updatedBlock && !updatedBlock.isOutputOnly() && !block.isBuilding() && !block.isDestructing()) {
-                            if(!(updatedBlock instanceof ConveyorBelt conveyorBelt && conveyorBelt.getDirection().x == -lX && conveyorBelt.getDirection().y == -lY)) { // check if the conveyor belt is facing into the block
-                                for(Map.Entry<ItemType, Integer> entry : getInventory().entrySet()) {
-                                    int newQuantity = updatedBlock.addItem(entry.getKey(), entry.getValue());
-                                    if(newQuantity != -1 || newQuantity == entry.getValue()) {
-                                        removeItem(entry.getKey(), entry.getValue()-newQuantity);
-                                    }
-                                }
+                    if(updatedBlock  != null) {
+                        for(Map.Entry<ItemType, Integer> entry : getInventory().entrySet()) {
+                            int newQuantity = updatedBlock.addItem(entry.getKey(), entry.getValue());
+                            if(newQuantity != -1 || newQuantity == entry.getValue()) {
+                                removeItem(entry.getKey(), entry.getValue()-newQuantity);
                             }
                         }
                     }

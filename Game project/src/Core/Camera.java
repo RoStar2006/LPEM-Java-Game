@@ -352,10 +352,10 @@ public class Camera {
      * @param y1
      * @param x2
      * @param y2
-     * @param thickness
+     * @param thickness in px, not scaled
      * @param color 
      */
-    public void drawLine(double x1, double y1, double x2, double y2, int thickness, Color color) {
+    public void drawLine(double x1, double y1, double x2, double y2, double thickness, Color color) {
         if(isOnScreen(x1, y1, x2 - x1, y2 - y1)) {
             setColor(color);
             Graphics2D g2d = (Graphics2D)g;
@@ -648,18 +648,19 @@ public class Camera {
         g.drawLine(xOffset, 0, xOffset, yOffset*2);
         g.drawLine(0, yOffset, xOffset*2, yOffset);
         g.setColor(new Color(0, 0, 0, 128));
-        g.fillRect(xOffset*2-100, 0, 100, g.getFontMetrics().getHeight()*8+1);
+        g.fillRect(xOffset*2-100, 0, 100, g.getFontMetrics().getHeight()*9+1);
         
         g.setColor(Color.GREEN);
-        g.drawString("Zoom: " + Utils.roundDouble(zoom, 3) + "x", xOffset*2-100, g.getFontMetrics().getHeight());
-        /*g.drawString("X: " + Utils.roundDouble(x, 3), xOffset*2-100, g.getFontMetrics().getHeight()*2);
-        g.drawString("Y: " + Utils.roundDouble(y, 3), xOffset*2-100, g.getFontMetrics().getHeight()*3);*/
-        g.drawString("X: " + getWorldX(), xOffset*2-100, g.getFontMetrics().getHeight()*2);
-        g.drawString("Y: " + getWorldY(), xOffset*2-100, g.getFontMetrics().getHeight()*3);
-        g.drawString("D. Calls: " + drawCount, xOffset*2-100, g.getFontMetrics().getHeight()*4);
-        g.drawString("M. Calls: " + callCount, xOffset*2-100, g.getFontMetrics().getHeight()*5);
-        g.drawString("D. Time: " + Utils.roundDouble((System.nanoTime() - start)/1000000.0, 1) + "ms", xOffset*2-100, g.getFontMetrics().getHeight()*6);
-        g.drawString("Mouse X: " + getMouseToWorldGridPosX(), xOffset*2-100, g.getFontMetrics().getHeight()*7);
-        g.drawString("Mouse Y: " + getMouseToWorldGridPosY(), xOffset*2-100, g.getFontMetrics().getHeight()*8);
+        g.drawString("C. Zoom: " + Utils.roundDouble(zoom, 3) + "x", xOffset*2-100, g.getFontMetrics().getHeight());
+        g.drawString("R. Zoom: " + Utils.roundDouble(1/zoom, 3) + "x", xOffset*2-100, g.getFontMetrics().getHeight()*2); // In the code I used the zoom in the wrong way (inverted), so let's simply invert it for the debug
+        /*g.drawString("X: " + Utils.roundDouble(x, 3), xOffset*2-100, g.getFontMetrics().getHeight()*3);
+        g.drawString("Y: " + Utils.roundDouble(y, 3), xOffset*2-100, g.getFontMetrics().getHeight()*4);*/
+        g.drawString("X: " + getWorldX(), xOffset*2-100, g.getFontMetrics().getHeight()*3);
+        g.drawString("Y: " + getWorldY(), xOffset*2-100, g.getFontMetrics().getHeight()*4);
+        g.drawString("D. Calls: " + drawCount, xOffset*2-100, g.getFontMetrics().getHeight()*5);
+        g.drawString("M. Calls: " + callCount, xOffset*2-100, g.getFontMetrics().getHeight()*6);
+        g.drawString("D. Time: " + Utils.roundDouble((System.nanoTime() - start)/1000000.0, 1) + "ms", xOffset*2-100, g.getFontMetrics().getHeight()*7);
+        g.drawString("Mouse X: " + getMouseToWorldGridPosX(), xOffset*2-100, g.getFontMetrics().getHeight()*8);
+        g.drawString("Mouse Y: " + getMouseToWorldGridPosY(), xOffset*2-100, g.getFontMetrics().getHeight()*9);
     }
 }

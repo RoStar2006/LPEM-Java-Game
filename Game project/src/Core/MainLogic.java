@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class MainLogic {
     public static Point SCREEN_RES;
     private long seed = 1;
-    public final static double GAME_SPEED = 1;
+    public final static double GAME_SPEED = 2;
     
     private Camera camera;
     private Controls controls;

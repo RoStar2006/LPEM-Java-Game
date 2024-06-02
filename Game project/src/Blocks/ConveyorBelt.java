@@ -9,6 +9,7 @@ import Items.ItemDrawer;
 import Items.ItemType;
 import World.World;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -20,15 +21,15 @@ public class ConveyorBelt extends UpdatedBlock {
     private final int maxItems = 4;
     private ArrayList<ItemType> alItemOrder = new ArrayList<>();
     private ArrayList<Double> alItemTime = new ArrayList<>();
-    private final double traverseTime = 60.0/120*maxItems; // seconds / items -> edit second value, unit is "item/minute"
+    private final double traverseTime = 60.0/180*maxItems; // seconds / items -> edit second value, unit is "item/minute"
     private final double maxCooldown = traverseTime / maxItems;
     private double curCooldown = 0;
-    private Point direction = new Point(0, -1); // up
     
     public ConveyorBelt(int x, int y) {
         super(x, y);
-        initBlock("Conveyor belt", 100, 1, 1, Color.GREEN);
-        setBlockType(BlockType.ConveyorBelt);
+        setDirection(new Point(0, -1));
+        initBlock("Conveyor belt", 15, 1, 1, Color.GREEN);
+        setBlockType(BlockType.ItemLogistic);
         createInventory(maxItems, maxItems, false);
     }
 
@@ -46,7 +47,8 @@ public class ConveyorBelt extends UpdatedBlock {
             }
         }
         
-        if(!alItemOrder.isEmpty() && alItemTime.get(0) <= 0 && world.getBlock(x+direction.x, y+direction.y) instanceof UpdatedBlock updatedBlock && !updatedBlock.isOutputOnly()) {
+        UpdatedBlock updatedBlock = getInputBlock(world, getDirection().x, getDirection().y);
+        if(!alItemOrder.isEmpty() && alItemTime.get(0) <= 0 && updatedBlock != null) { // Check if any items needs to be transported, if the tranfer time reached 0 and a receiving block is available
             int newQuantity = updatedBlock.addItem(alItemOrder.get(0), 1);
             if(newQuantity == 0) {
                 removeItem(alItemOrder.get(0), 1);
@@ -59,7 +61,7 @@ public class ConveyorBelt extends UpdatedBlock {
     @Override
     public void draw(Camera c) {
         super.draw(c);
-        c.drawLine(x+width/2.0, y+height/2.0, x+(width+direction.x)/2.0, y+(height+direction.y)/2.0, Color.BLACK);
+        c.drawLine(x+width/2.0, y+height/2.0, x+(width+getDirection().x)/2.0, y+(height+getDirection().y)/2.0, Color.BLACK);
     }
 
     @Override
@@ -68,9 +70,23 @@ public class ConveyorBelt extends UpdatedBlock {
         double cX = x+width/2.0;
         double cY = y+height/2.0;
         for(int i = alItemTime.size()-1; i >= 0; i--) {
-            double offsetTime = (traverseTime/2 - alItemTime.get(i))/traverseTime;
-            ItemDrawer.drawItem(c, alItemOrder.get(i), cX+direction.x*offsetTime, cY+direction.y*offsetTime, size);
+            if (i < alItemTime.size()) {
+                double offsetTime = (traverseTime/2 - alItemTime.get(i))/traverseTime;
+                ItemDrawer.drawItem(c, alItemOrder.get(i), cX+getDirection().x*offsetTime, cY+getDirection().y*offsetTime, size);
+            } else {
+                i = alItemOrder.size()-1;
+            }
         }
+    }
+    
+    @Override
+    public void drawIcon(Graphics g, int x, int y, int size) {
+        g.setColor(Color.GREEN);
+        g.fillRect(x, y, size/2, size/2);
+        g.fillRect(x+size/2, y+size/2, size/2, size/2);
+        g.setColor(Color.MAGENTA);
+        g.fillRect(x+size/2, y, size/2, size/2);
+        g.fillRect(x, y+size/2, size/2, size/2);
     }
 
     @Override
@@ -83,14 +99,6 @@ public class ConveyorBelt extends UpdatedBlock {
         alItemTime.add(traverseTime);
         
         return quantity-1 + super.addItem(itemType, 1);
-    }
-
-    public void setDirection(Point direction) {
-        this.direction = direction;
-    }
-
-    public Point getDirection() {
-        return direction;
     }
     
 }
