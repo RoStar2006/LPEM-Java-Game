@@ -174,7 +174,7 @@ public class World {
                     }
 
                     alPlannedBlocks.add(new PlannedBlock(block, 0));
-                    block.getStatsManager().takeDamage(block.getStatsManager().getMaxHealth()-1, this);
+                    block.getStatsManager().setToOneHP();
                 }
             }
             

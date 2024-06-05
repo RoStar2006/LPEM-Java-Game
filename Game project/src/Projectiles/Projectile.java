@@ -43,7 +43,7 @@ public class Projectile {
     private double curDecay = 0;
     private boolean extendedToTarget = false;
     
-    protected Color coreColor = new Color(255, 164, 0, 255);
+    protected Color coreColor = new Color(255, 164, 0);
     protected Color trailColor = new Color(255, 164, 0, 64);
     
     private double lastStepX, lastStepY;
@@ -51,6 +51,12 @@ public class Projectile {
     private Point2D.Double point2D;
     
     public Projectile(double startX, double startY, double xDir, double yDir, double range, StatsManager source, StatsManager target) {
+        fullInit(startX, startY, xDir, yDir, range, source, target);
+        
+        init(10, 0.25, 0.75);
+    }
+    
+    public void fullInit(double startX, double startY, double xDir, double yDir, double range, StatsManager source, StatsManager target) {
         this.startX = startX;
         this.x = startX;
         this.startY = startY;
@@ -61,11 +67,11 @@ public class Projectile {
         this.yDir = yDir;
         this.endX = startX+xDir*range;
         this.endY = startY+yDir*range;
+        this.hit = false;
+        this.curDecay = 0;
         
         point2D = new Point2D.Double(target.getCenterX(), target.getCenterY());
         line2D = new Line2D.Double(startX, startY, startX, startY);
-        
-        init(10, 0.25, 0.75);
     }
     
     protected void init(double speed, double width, double length) {

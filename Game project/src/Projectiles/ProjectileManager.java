@@ -16,7 +16,12 @@ public class ProjectileManager {
     private ArrayList<Projectile> alProjectiles = new ArrayList<>();
     
     public void update(double deltaTime, World world) {
-        alProjectiles.removeIf(projectile -> projectile.update(deltaTime, world));
+        for(int i = alProjectiles.size()-1; i >= 0; i--) {
+            if(alProjectiles.get(i).update(deltaTime, world)) {
+                ProjectilePool.queue(alProjectiles.get(i));
+                alProjectiles.remove(i);
+            }
+        }
     }
     
     public void draw(Camera c) {

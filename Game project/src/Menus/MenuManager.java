@@ -8,6 +8,7 @@ import Core.Camera;
 import Core.MainLogic;
 import Core.Utils;
 import Blocks.*;
+import Items.ItemType;
 import World.BuildManager;
 import World.World;
 import java.awt.Color;
@@ -17,6 +18,7 @@ import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  *
@@ -44,6 +46,7 @@ public class MenuManager {
     private final Color bMenuBGColor = new Color(255, 255, 255, 64);
     private ArrayList<Block> alBuildingBlocks = new ArrayList<>();
     private Block selectedBlock;
+    private int blockMenuHeight = 0;
     
     /*
         Build and placing
@@ -105,17 +108,17 @@ public class MenuManager {
         Font f = g.getFont();
         g.setFont(f.deriveFont((float)bFontSize));
         g.setColor(bMenuBGColor);
-        g.fillRect(bMenuX, bMenuY-bFontSize, bMenuWidth, bMenuHeight+bFontSize);
+        g.fillRect(bMenuX, bMenuY, bMenuWidth, bMenuHeight);
+        
+        blockMenuHeight = 0;
         
         if(selectedBlock != null) {
-            g.setColor(Color.WHITE);
-            g.drawString(selectedBlock.getName(), bMenuX, bMenuY);
-        } else {
+            drawBlockMenu(g, selectedBlock);
+        } else if(c.getMouseX() >= bMenuX && c.getMouseY() >= bMenuY) {
             int index = calulateBuildMenuIndex();
             
             if(index != -1) {
-                g.setColor(Color.WHITE);
-                g.drawString(alBuildingBlocks.get(index).getName(), bMenuX, bMenuY);
+                drawBlockMenu(g, alBuildingBlocks.get(index));
             }
         }
         
@@ -133,6 +136,24 @@ public class MenuManager {
                 x = 0;
                 y--;
             }
+        }
+    }
+    
+    private void drawBlockMenu(Graphics g, Block b) {
+        blockMenuHeight = 0;
+        int count = 1 + b.getHmNeededItems().size();
+        blockMenuHeight += bFontSize * count;
+        int strPosY = bMenuY-bFontSize*(count-1);
+        
+        g.setColor(bMenuBGColor);
+        g.fillRect(bMenuX, bMenuY-blockMenuHeight, bMenuWidth, blockMenuHeight);
+        
+        g.setColor(Color.WHITE);
+        g.drawString(b.getName(), bMenuX, strPosY);
+        int i = 0;
+        for(Map.Entry<ItemType, Integer> entry : b.getHmNeededItems().entrySet()) {
+            strPosY += bFontSize;
+            g.drawString(entry.getKey() + " " + world.getCore().getInventory().getOrDefault(entry.getKey(), 0) + "/"+ entry.getValue(), bMenuX, strPosY);
         }
     }
     
@@ -171,9 +192,9 @@ public class MenuManager {
     }
     
     public void mouseClickInput(int x, int y, boolean leftClick, boolean released) {
-        if(x >= bMenuX && y >= bMenuY-bFontSize && removeStartPoint == null && placeStartPoint == null) { // Click inside the build menu
+        if(x >= bMenuX && y >= bMenuY-blockMenuHeight && removeStartPoint == null && placeStartPoint == null) { // Click inside the build menu
             if(released) {
-                if(y < bMenuY) { // Check if mouse is hovering over the selected block title
+                if(y < bMenuY) { // Check if mouse is hovering over the selected block menu
                     resetSelection();
                     return;
                 }
@@ -231,7 +252,7 @@ public class MenuManager {
         int x = evt.getX();
         int y = evt.getY();
         
-        if(!(x >= bMenuX && y >= bMenuY-bFontSize)) { // Scroll outside of build menu
+        if(!(x >= bMenuX && y >= bMenuY-blockMenuHeight)) { // Scroll outside of build menu
             if(!evt.isControlDown() && selectedBlock instanceof UpdatedBlock updatedBlock && updatedBlock.hasDirection()) {
                 updatedBlock.setDirection(buildManager.getNextDirection(updatedBlock.getDirection(), evt.getWheelRotation() == -1));
                 rotatedBlock = true;

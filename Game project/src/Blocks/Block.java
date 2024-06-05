@@ -7,7 +7,6 @@ package Blocks;
 import Core.Camera;
 import Core.StatsManager;
 import Items.ItemType;
-import World.World;
 import World.WorldManager;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -63,10 +62,10 @@ public class Block {
         c.fillRect(x, y, width, height, color);
         c.drawRect(x, y, width, height, Color.BLACK);
         
-        /*if(statsManager.getMaxHealth() > 0) {
+        if(statsManager.getMaxHealth() > 0 && isActive() && statsManager.showDamage()) {
             c.fillRect(x, y-healthBarHeight, width, healthBarHeight, Color.GRAY);
             c.fillRect(x, y-healthBarHeight, width * (statsManager.getHealth()/(double)statsManager.getMaxHealth()), healthBarHeight, Color.RED);
-        }*/
+        }
         
         if(isDestructing) {
             drawDestructOverlay(c);

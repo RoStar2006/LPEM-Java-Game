@@ -10,6 +10,7 @@ import Core.Utils;
 import Enemies.Enemy;
 import Items.ItemType;
 import Projectiles.Projectile;
+import Projectiles.ProjectilePool;
 import World.World;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -31,8 +32,6 @@ public class Tower extends UpdatedBlock {
     private Class<? extends Projectile> pClass;
     
     private HashMap<ItemType, Integer> hmProjectileCost = new HashMap<>();
-    
-    private final Class[] paramTypesSub = { double.class, double.class, double.class, double.class, double.class, StatsManager.class, StatsManager.class }; // The costructor template for the projectile creation
     
     public Tower(int x, int y) {
         super(x, y);
@@ -86,21 +85,10 @@ public class Tower extends UpdatedBlock {
     }
     
     protected void shoot(World world, Enemy enemy, double spread) {
-        double angle = Math.atan2(enemy.getCenterY() - getCenterY(), enemy.getCenterX() - getCenterX()) + Math.toRadians(spread);
-        double xDir = Math.cos(angle);
-        double yDir = Math.sin(angle);
+        Projectile p = ProjectilePool.get(pClass,  statsManager, enemy.getStatsManager(), spread, range);
         
-        Object[] paramValuesSub = {getCenterX(), getCenterY(), xDir, yDir, range, statsManager, enemy.getStatsManager()};
-        
-        Projectile p = null;
-        try {
-            p = pClass.getDeclaredConstructor(paramTypesSub).newInstance(paramValuesSub); 
-        } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-            System.err.println("ERROR while creating projectile!");
-        } finally {
-            if(p != null) {
-                world.getProjectileManager().add(p);
-            }
+        if(p != null) {
+            world.getProjectileManager().add(p);
         }
     }
     

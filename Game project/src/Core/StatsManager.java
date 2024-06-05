@@ -20,6 +20,8 @@ public class StatsManager {
     private double curAttackCooldown;
     private Block block;
     private Enemy enemy;
+    private long lastDamageTime = 0; // ms
+    private final int damageDisplaySpan = 3000; // ms
     
     public StatsManager(double maxHealth) {
         init(maxHealth);
@@ -74,6 +76,7 @@ public class StatsManager {
     
     public void takeDamage(double amount, World world) {
         health -= amount;
+        lastDamageTime = System.currentTimeMillis();
         
         if(health <= 0) {
             health = 0;
@@ -85,6 +88,7 @@ public class StatsManager {
     
     public void regenerateFlat(double amount) {
         health += amount;
+        lastDamageTime = System.currentTimeMillis();
         
         if(health > maxHealth) {
             health = maxHealth;
@@ -93,6 +97,27 @@ public class StatsManager {
     
     public void regeneratePerc(double percentage) {
         regenerateFlat(maxHealth*percentage);
+    }
+    
+    /**
+     * This method should only be used by the {@link PlannedBlock} class.
+     * It regenerates n percent of health without showing the health bar
+     * @param percentage 
+     */
+    public void hiddenRegen(double percentage) {
+        health += maxHealth*percentage;
+        
+        if(health > maxHealth) {
+            health = maxHealth;
+        }
+    }
+    
+    /**
+     * This method should only be used by the {@link World} class.
+     * It sets the health to 1 without showing the health bar
+     */
+    public void setToOneHP() {
+        health = 1;
     }
     
     /*
@@ -140,6 +165,10 @@ public class StatsManager {
 
     public double getDamage() {
         return damage;
+    }
+    
+    public boolean showDamage() {
+        return (System.currentTimeMillis() - lastDamageTime) < damageDisplaySpan;
     }
     
     public double getCenterX() {

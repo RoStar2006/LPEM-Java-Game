@@ -47,6 +47,6 @@ public class PlannedBlock {
     }
     
     public void regenerateBlock(double deltaTime) {
-        block.getStatsManager().regeneratePerc(deltaTime / maxCooldown);
+        block.getStatsManager().hiddenRegen(deltaTime / maxCooldown);
     }
 }
