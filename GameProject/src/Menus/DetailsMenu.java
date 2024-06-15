@@ -7,6 +7,7 @@ package Menus;
 import Blocks.Base.Block;
 import Blocks.Base.BlockType;
 import Blocks.Base.ConveyorBelt;
+import Blocks.Base.NodeCollector;
 import Blocks.Base.RecipeBlock;
 import Blocks.Base.UpdatedBlock;
 import Blocks.Base.Tower;
@@ -106,6 +107,9 @@ public class DetailsMenu {
                     }
                     alDetailsString.add(str);
                 }
+            } else if(updatedBlock instanceof NodeCollector nodeCollector) {
+                alDetailsString.add("<title>Input/Output");
+                alDetailsString.add(addNumber("Mining Speed:", nodeCollector.getMiningSpeed()) + " items/second");
             }
         } 
     }

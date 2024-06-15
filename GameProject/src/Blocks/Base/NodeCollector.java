@@ -66,4 +66,12 @@ public class NodeCollector extends UpdatedBlock {
         setName(super.getName() + " (" + Inventory.formatName(node.getCollectableResource()) + ")");
     }
     
+    /**
+     * 
+     * @return Returns the mining speed in items/sec
+     */
+    public double getMiningSpeed() {
+        return 1.0/maxCooldown;
+    }
+    
 }
