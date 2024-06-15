@@ -11,6 +11,8 @@ import Core.Utils;
 import Items.ItemType;
 import World.BuildManager;
 import World.World;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -18,12 +20,15 @@ import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,16 +81,8 @@ public class MenuManager {
     
     public MenuManager(Camera camera) {
         this.c = camera;
-        /*alBuildingBlocks.add(new ConveyorBelt(0, 0));
-        alBuildingBlocks.add(new Splitter(0, 0));
-        alBuildingBlocks.add(new Merger(0, 0));
-        alBuildingBlocks.add(new RecipeBlock(0, 0));
-        alBuildingBlocks.add(new NodeCollector(0, 0));
-        alBuildingBlocks.add(new Wall(0, 0));
-        alBuildingBlocks.add(new BigWall(0, 0));
-        alBuildingBlocks.add(new Tower(0, 0));*/
         
-        initBuildList();
+        initBuildingBlocks();
 
         bMenuRows = (int)Math.ceil(alBuildingBlocks.size() / (double)bXItemCount);
     }
@@ -93,6 +90,18 @@ public class MenuManager {
     public void init(BuildManager buildManager, World world) {
         this.buildManager = buildManager;
         this.world = world;
+    }
+    
+    private void initBuildingBlocks() {
+        try (ScanResult scanResult = new ClassGraph().acceptPackages("Blocks").enableClassInfo().scan()) {
+            List<Class<Block>> alBlockClasses = scanResult.getSubclasses(Block.class.getName()).loadClasses(Block.class);
+            
+            for(Class<Block> bC : alBlockClasses) {
+                if(!bC.getPackage().getName().contains("Base") && !bC.getPackage().getName().contains("Nodes")) {
+                    alBuildingBlocks.add(BuildManager.createBlock(bC));
+                }
+            }
+        }
     }
     
     public void draw(Graphics g) {
@@ -334,88 +343,4 @@ public class MenuManager {
         return true;
     }
     
-    /**
-     * This method automatically retrieves all blocks and adds them to the build menu.
-     */
-    @SuppressWarnings("unchecked")
-    private void initBuildList() {
-        ArrayList<Class> classes = null;
-        
-        try {
-            classes = getClasses("Blocks");
-        } catch(ClassNotFoundException | IOException ex) {
-            Logger.getLogger(MenuManager.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if(classes != null) {
-                for(Class clazz : classes) {
-                    Block b = null;
-                    
-                    if(Block.class.isAssignableFrom(clazz)) { // This line checks if the class is a block, so we can safely suppress the warnings
-                        b = BuildManager.createBlock((Class<? extends Block>)clazz);
-                    }
-                    
-                    if(b != null) {
-                        alBuildingBlocks.add(b);
-                    }
-                }
-            }
-        }
-    }
-    
-    /**
-    * Scans all classes accessible from the context class loader which belong to the given package and subpackages. <br>
-    * https://stackoverflow.com/questions/520328/can-you-find-all-classes-in-a-package-using-reflection
-    * @param packageName The base package
-    * @return The classes
-    * @throws ClassNotFoundException
-    * @throws IOException
-    */
-    private static ArrayList<Class> getClasses(String packageName) throws ClassNotFoundException, IOException {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        
-        assert classLoader != null;
-        
-        String path = packageName.replace('.', '/');
-        Enumeration<URL> resources = classLoader.getResources(path);
-        List<File> dirs = new ArrayList<>();
-        while (resources.hasMoreElements()) {
-            URL resource = resources.nextElement();
-            dirs.add(new File(resource.getFile()));
-        }
-        
-        ArrayList<Class> classes = new ArrayList<>();
-        for (File directory : dirs) {
-            classes.addAll(findClasses(directory, packageName));
-        }
-        
-        return classes;
-    }
-
-    /**
-     * Recursive method used to find all classes in a given directory and subdirs. <br>
-     * Exceptions: Base, Nodes packages
-     * @param directory   The base directory
-     * @param packageName The package name for classes found inside the base directory
-     * @return The classes
-     * @throws ClassNotFoundException
-     */
-    private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-        List<Class> classes = new ArrayList<>();
-        
-        if (!directory.exists() || directory.getName().contains("Base") || directory.getName().contains("Nodes")) {
-            return classes;
-        }
-        
-        File[] files = directory.listFiles();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                assert !file.getName().contains(".");
-                classes.addAll(findClasses(file, packageName + "." + file.getName()));
-            } else if (file.getName().endsWith(".class")) {
-                classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
-            }
-        }
-        
-        return classes;
-    }
 }
