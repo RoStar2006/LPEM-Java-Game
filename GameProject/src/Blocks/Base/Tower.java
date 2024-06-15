@@ -9,6 +9,7 @@ import Core.Utils;
 import Enemies.Enemy;
 import Items.Inventory;
 import Items.ItemType;
+import Menus.DetailsMenu;
 import Projectiles.Base.Projectile;
 import Projectiles.Base.ProjectilePool;
 import World.World;
@@ -133,7 +134,7 @@ public class Tower extends UpdatedBlock {
         
         for(Map.Entry<ItemType, Integer> entry : hmProjectileCost.entrySet()) {
             strArr.add("<itemIcon>" + Inventory.formatName(entry.getKey()));
-            strArr.add("Damage:" + hmProjectileDamage.get(entry.getKey()));
+            strArr.add(DetailsMenu.addNumber("Damage:", hmProjectileDamage.get(entry.getKey())));
             strArr.add("Needed:" + entry.getValue());
         }
         

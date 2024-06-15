@@ -114,7 +114,7 @@ public class DetailsMenu {
         } 
     }
     
-    private String addNumber(String str, double number) {
+    public final static String addNumber(String str, double number) {
         if(number % 1 <= 0.1) {
             str += (int)number;
         } else {
