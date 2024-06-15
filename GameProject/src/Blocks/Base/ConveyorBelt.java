@@ -36,7 +36,7 @@ public class ConveyorBelt extends UpdatedBlock {
         createInventory(maxItems, maxItems, false);
     }
     
-    protected final void setTraverseTime(int itemPerMinute) {
+    protected final void setTravelSpeed(int itemPerMinute) {
         maxCooldown = 60.0/itemPerMinute; // seconds/item
         traverseTime = maxCooldown*maxItems;
     }
