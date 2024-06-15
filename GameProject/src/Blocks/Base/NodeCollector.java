@@ -27,8 +27,8 @@ public class NodeCollector extends UpdatedBlock {
         addAllowedNode(Node.class);
     }
 
-    protected final void setMaxCooldown(double maxCooldown) {
-        this.maxCooldown = maxCooldown;
+    protected final void setMiningSpeed(double itemPerMinute) {
+        this.maxCooldown = 60.0/itemPerMinute;
     }
 
     @Override
