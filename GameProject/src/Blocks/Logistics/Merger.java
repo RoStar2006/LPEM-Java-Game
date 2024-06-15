@@ -20,7 +20,7 @@ public class Merger extends UpdatedBlock {
     public Merger(int x, int y) {
         super(x, y);
         setDirection(new Point(0, -1));
-        initBlock("Merger", 20, 1, 1, Color.LIGHT_GRAY, Color.MAGENTA);
+        initBlock("Merger", 20, 1, 1, Color.MAGENTA, Color.LIGHT_GRAY);
         setBlockType(BlockType.ItemLogistic);
         createInventory(1, 1, false);
     }

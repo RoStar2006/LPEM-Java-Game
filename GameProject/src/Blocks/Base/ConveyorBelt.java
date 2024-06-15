@@ -4,8 +4,6 @@
  */
 package Blocks.Base;
 
-import Blocks.Base.BlockType;
-import Blocks.Base.UpdatedBlock;
 import Core.Camera;
 import Items.ItemDrawer;
 import Items.ItemType;
@@ -13,7 +11,6 @@ import World.World;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Polygon;
 import java.util.ArrayList;
 
 /**

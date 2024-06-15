@@ -6,14 +6,11 @@ package Blocks.Logistics;
 
 import Blocks.Base.BlockType;
 import Blocks.Base.UpdatedBlock;
-import Core.Camera;
 import Items.ItemType;
 import World.World;
-import World.WorldManager;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Polygon;
 
 /**
  *
@@ -33,7 +30,7 @@ public class Splitter extends UpdatedBlock {
         super(x, y);
         setDirection(new Point(0, -1));
         setExitArrowStyle(false);
-        initBlock("Splitter", 20, 1, 1, Color.DARK_GRAY, Color.MAGENTA);
+        initBlock("Splitter", 20, 1, 1, Color.MAGENTA, Color.DARK_GRAY);
         setBlockType(BlockType.ItemLogistic);
         createInventory(1, 1, false);
     }

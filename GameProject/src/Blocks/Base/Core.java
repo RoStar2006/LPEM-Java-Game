@@ -4,11 +4,9 @@
  */
 package Blocks.Base;
 
-import Blocks.Base.UpdatedBlock;
 import Items.ItemType;
 import World.World;
 import java.awt.Color;
-import java.awt.Graphics;
 
 /**
  *
@@ -18,7 +16,7 @@ public class Core extends UpdatedBlock {
     
     public Core(int x, int y) {
         super(x, y);
-        initBlock("Core", 1000, 3, 3, Color.RED, Color.CYAN);
+        initBlock("Core", 1000, 3, 3, Color.BLUE, Color.CYAN);
         createInventory(4000, 0, false);
         forceAddItem(ItemType.CopperOre, 20);
         forceAddItem(ItemType.IronOre, 20);
