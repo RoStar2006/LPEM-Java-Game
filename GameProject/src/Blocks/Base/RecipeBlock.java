@@ -43,7 +43,7 @@ public class RecipeBlock extends UpdatedBlock {
             for(Recipe recipe : alRecipes) {                
                 boolean crafted = false;
                 
-                while(recipe.canCraft(getInventory())) {
+                while(recipe.canCraft(getInventory()) && curCooldown <= 0) {
                     craft(recipe);
                     crafted = true;
                 }
