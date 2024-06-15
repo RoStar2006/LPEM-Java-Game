@@ -10,6 +10,7 @@ import Enemies.Enemy;
 import Items.Inventory;
 import Items.ItemType;
 import Menus.DetailsMenu;
+import Projectiles.Base.PlannedProjectile;
 import Projectiles.Base.Projectile;
 import Projectiles.Base.ProjectilePool;
 import World.World;
@@ -22,32 +23,36 @@ import java.util.Map;
  *
  * @author Romeo
  */
-public class Tower extends UpdatedBlock {
+public class Turret extends UpdatedBlock {
     private static final Color RANGE_COLOR = new Color(255, 255, 255, 128);
     private double range = 12; // In blocks
     private double spread = 0;
     private double projectileCount = 1;
     private double spreadStep = 0;
+    private double projectileDelay = 0;
     private Class<? extends Projectile> pClass;
+    
+    private ArrayList<PlannedProjectile> alPlannedProjectiles = new ArrayList<>();
     
     private HashMap<ItemType, Integer> hmProjectileCost = new HashMap<>();
     private HashMap<ItemType, Double> hmProjectileDamage = new HashMap<>();
     private ItemType curAmmoType = null;
     
-    public Tower(int x, int y) {
+    public Turret(int x, int y) {
         super(x, y);
         setBlockType(BlockType.Tower);
         initBlock("Tower", 200, 1, 1, Color.WHITE, Color.ORANGE);
-        initTower(Projectile.class, 0.5, 12, 0, 1);
+        initTower(Projectile.class, 0.5, 0, 12, 0, 1);
     }
     
-    protected final void initTower(Class<? extends Projectile> pClass, double attackSpeed, double range, double spread, double projectileCount) {
+    protected final void initTower(Class<? extends Projectile> pClass, double attackSpeed, double projectileDelay, double range, double spread, double projectileCount) {
         statsManager.init(1, attackSpeed);
         this.pClass = pClass;
         this.range = range;
         this.spread = spread/2;
         this.projectileCount = projectileCount;
         this.spreadStep = spread / projectileCount;
+        this.projectileDelay = projectileDelay;
     }
     
     protected final void addProjectileCost(ItemType neededItem, int quantity, double damage) {
@@ -73,24 +78,35 @@ public class Tower extends UpdatedBlock {
                     double curSpread = -spread;
                     
                     for(double i = 0; i < projectileCount; i++) {
-                        shoot(world, enemy, curSpread);
+                        shoot(world, enemy, curSpread, i*projectileDelay);
                         curSpread += spreadStep;
                     }
                 } else if(projectileCount == 1 && spread != 0) {
                     double randomSpread = Utils.nextDouble(-spread, spread);
                     
-                    shoot(world, enemy, randomSpread);
+                    shoot(world, enemy, randomSpread, 0);
                 }
+            }
+        }
+        
+        for(int i = alPlannedProjectiles.size()-1; i >= 0; i--) {
+            if(alPlannedProjectiles.get(i).update(deltaTime)) {
+                world.getProjectileManager().add(alPlannedProjectiles.get(i).getProjectile());
+                alPlannedProjectiles.remove(i);
             }
         }
     }
     
-    protected void shoot(World world, Enemy enemy, double spread) {
+    protected void shoot(World world, Enemy enemy, double spread, double delay) {
         double damage = hmProjectileDamage.getOrDefault(curAmmoType, statsManager.getDamage());
         Projectile p = ProjectilePool.get(pClass,  statsManager, enemy.getStatsManager(), spread, range, damage);
         
         if(p != null) {
-            world.getProjectileManager().add(p);
+            if(delay == 0) {
+                world.getProjectileManager().add(p);
+            } else {
+                alPlannedProjectiles.add(new PlannedProjectile(p, delay));
+            }
         }
     }
     

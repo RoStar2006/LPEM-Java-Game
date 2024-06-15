@@ -4,17 +4,10 @@
  */
 package Menus;
 
-import Blocks.Base.Block;
-import Blocks.Base.BlockType;
-import Blocks.Base.ConveyorBelt;
-import Blocks.Base.NodeCollector;
-import Blocks.Base.RecipeBlock;
-import Blocks.Base.UpdatedBlock;
-import Blocks.Base.Tower;
+import Blocks.Base.*;
 import Core.MainLogic;
 import Items.Inventory;
 import Items.ItemDrawer;
-import Items.ItemType;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -76,7 +69,7 @@ public class DetailsMenu {
                 }
             }
             
-            if(updatedBlock instanceof Tower tower) {
+            if(updatedBlock instanceof Turret tower) {
                 alDetailsString.add("<title>Function");
                 alDetailsString.add(addNumber("Range:", tower.getRange()) + " blocks");
                 alDetailsString.add(addNumber("Fire Rate:", tower.getStatsManager().getAttackRate()) + "/second");
