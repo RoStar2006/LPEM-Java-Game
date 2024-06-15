@@ -16,7 +16,6 @@ import java.awt.Point;
  * @author Romeo
  */
 public class Merger extends UpdatedBlock {
-    private ItemType curItemType = null;
     
     public Merger(int x, int y) {
         super(x, y);
@@ -28,29 +27,18 @@ public class Merger extends UpdatedBlock {
 
     @Override
     public void update(double deltaTime, World world) {
-        if(curItemType == null) { // No item to transport
+        if(getInventory().isEmpty()) { // No item to transport
             return;
         }
         
         UpdatedBlock updatedBlock = getInputBlock(world, getDirection().x, getDirection().y);
         if(updatedBlock != null) {
-            int newQuantity = updatedBlock.addItem(curItemType, 1);
+            ItemType itemType = (ItemType)getInventory().keySet().toArray()[0];
+            int newQuantity = updatedBlock.addItem(itemType, 1);
             if(newQuantity == 0) {
-                removeItem(curItemType, 1);
-                curItemType = null;
+                removeItem(itemType, 1);
             }
         }
-    }
-    
-    @Override
-    public int addItem(ItemType itemType, int quantity) {
-        int newQuantity = super.addItem(itemType, quantity);
-        
-        if(newQuantity < quantity) {
-            curItemType = itemType;
-        }
-        
-        return newQuantity;
     }
     
 }
