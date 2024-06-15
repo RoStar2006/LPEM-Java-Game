@@ -67,7 +67,7 @@ public class DetailsMenu {
                 if(block.getBlockType() == BlockType.ItemLogistic) {
                     String speedStr = "Speed:";
                     if(updatedBlock instanceof ConveyorBelt conveyorBelt) {
-                        speedStr += addNumber(speedStr, conveyorBelt.getSpeed()) + " items/second";
+                        speedStr = addNumber(speedStr, conveyorBelt.getSpeed()) + " items/second";
                     } else {
                         speedStr += "instant";
                     }
