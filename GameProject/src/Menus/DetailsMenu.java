@@ -47,7 +47,7 @@ public class DetailsMenu {
         alDetailsString.add("<title><center><blockIcon>" + block.getName());
         alDetailsString.add("<offset>1");
         alDetailsString.add("<title>General");
-        alDetailsString.add("Health:" + (int)block.getStatsManager().getMaxHealth());
+        alDetailsString.add(addNumber("Health:", block.getStatsManager().getMaxHealth()));
         alDetailsString.add("Size:" + block.getWidth() + "x" + block.getHeight());
         
         String[] costsArr = Inventory.formatList(block.getHmNeededItems());
@@ -67,13 +67,7 @@ public class DetailsMenu {
                 if(block.getBlockType() == BlockType.ItemLogistic) {
                     String speedStr = "Speed:";
                     if(updatedBlock instanceof ConveyorBelt conveyorBelt) {
-                        double speed = conveyorBelt.getSpeed();
-                        if(speed % 1 <= 0.1) {
-                            speedStr += (int)speed;
-                        } else {
-                            speedStr += speed;
-                        }
-                        speedStr += " items/second";
+                        speedStr += addNumber(speedStr, conveyorBelt.getSpeed()) + " items/second";
                     } else {
                         speedStr += "instant";
                     }
@@ -83,10 +77,10 @@ public class DetailsMenu {
             
             if(updatedBlock instanceof Tower tower) {
                 alDetailsString.add("<title>Function");
-                alDetailsString.add("Range:"+tower.getRange() + " blocks");
-                alDetailsString.add("Fire Rate:"+tower.getStatsManager().getAttackRate() + "/second");
-                alDetailsString.add("Spread:"+tower.getSpread()+" degrees");
-                alDetailsString.add("Projectile Count:"+tower.getProjectileCount());
+                alDetailsString.add(addNumber("Range:", tower.getRange()) + " blocks");
+                alDetailsString.add(addNumber("Fire Rate:", tower.getStatsManager().getAttackRate()) + "/second");
+                alDetailsString.add(addNumber("Spread:", tower.getSpread()) + " degrees");
+                alDetailsString.add(addNumber("Projectile Count:", tower.getProjectileCount()));
                 ArrayList<String> alProjectileDetails = tower.formattedProjectileDetails();
                 for(String str : alProjectileDetails) {
                     if(str.contains("<itemIcon>")) {
@@ -114,6 +108,16 @@ public class DetailsMenu {
                 }
             }
         } 
+    }
+    
+    private String addNumber(String str, double number) {
+        if(number % 1 <= 0.1) {
+            str += (int)number;
+        } else {
+            str += number;
+        }
+        
+        return str;
     }
     
     public void draw(Graphics g) {
