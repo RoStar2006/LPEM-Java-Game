@@ -6,7 +6,7 @@ package Blocks.Base;
 
 import Core.Camera;
 import Core.Utils;
-import Enemies.Enemy;
+import Enemies.Base.Enemy;
 import Items.Inventory;
 import Items.ItemType;
 import Menus.DetailsMenu;

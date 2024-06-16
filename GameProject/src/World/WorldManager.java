@@ -11,8 +11,8 @@ import Blocks.Base.Node;
 import Blocks.Base.UpdatedBlock;
 import Core.Camera;
 import Core.MainLogic;
-import Enemies.EnemyManager;
-import Enemies.SpawnRegion;
+import Enemies.Base.EnemyManager;
+import Enemies.Base.SpawnRegion;
 import Menus.MenuManager;
 import Core.Utils;
 import Projectiles.Base.ProjectileManager;
@@ -42,6 +42,7 @@ public class WorldManager {
     private BuildManager buildManager;
     
     private double nextWave = 1; // seconds
+    private double waveDelay = 120; // seconds
 
     public WorldManager(MenuManager menuManager) {
         this.menuManager = menuManager;
@@ -62,7 +63,7 @@ public class WorldManager {
         
         if(nextWave <= 0) {
             enemyManager.spawnEnemies(world.getCore());
-            nextWave = 120;
+            nextWave = waveDelay;
         }
     }
     
@@ -92,6 +93,8 @@ public class WorldManager {
         Font oldFont = g.getFont();
         g.setFont(oldFont.deriveFont(24f));
         g.drawString(timeStr, (MainLogic.SCREEN_RES.x - g.getFontMetrics().stringWidth(timeStr))/2, g.getFontMetrics().getHeight());
+        String waveStr = "Next Wave: " + enemyManager.getCurWave();
+        g.drawString(waveStr, (MainLogic.SCREEN_RES.x - g.getFontMetrics().stringWidth(waveStr))/2, (int)(g.getFontMetrics().getHeight()*1.75));
         g.setFont(oldFont);
     }
     

@@ -8,7 +8,7 @@ import Core.Camera;
 import Core.MainLogic;
 import Core.StatsManager;
 import Core.Utils;
-import Enemies.Enemy;
+import Enemies.Base.Enemy;
 import World.World;
 import World.WorldManager;
 import java.awt.Color;

@@ -5,7 +5,7 @@
 package Core;
 
 import Blocks.Base.Block;
-import Enemies.Enemy;
+import Enemies.Base.Enemy;
 import World.World;
 
 /**

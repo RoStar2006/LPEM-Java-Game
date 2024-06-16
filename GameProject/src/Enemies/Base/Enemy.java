@@ -2,10 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Enemies;
+package Enemies.Base;
 
-import Core.Camera;
 import Blocks.Base.Block;
+import Core.Camera;
 import Blocks.Base.Core;
 import Core.StatsManager;
 import World.World;
@@ -23,29 +23,60 @@ public class Enemy {
     private int speed;
     private Core core;
     private double size;
-    private double range;
+    private int range;
     private StatsManager statsManager;
+    private Color color;
     
     private double xDir, yDir;
+    
+    /**
+     * Chance from 0 to 100% for this enemy to spawn.
+     * This chance is used to calculate the enemy's weight.
+     */
+    private double chance = 100;
+    /**
+     * How much the enemy costs for it to spawn.
+     */
+    private int cost = 1;
+    private double weight = 0;
 
     public Enemy(double x, double y, Core core) {
+        statsManager = new StatsManager(10);
+        statsManager.setEnemy(this);
+        
+        init(x, y, core);
+        initEnemy(10, 1, 0.75, 1, 7, 0.5, Color.RED);
+    }
+    
+    public final void init(double x, double y, Core core) {
         this.x = x;
         this.y = y;
         this.core = core;
         
-        statsManager = new StatsManager(10);
-        statsManager.setEnemy(this);
-        
-        initEnemy(10, 1, 0.75, 1, 0.5, 7);
-        
-        calcDir();
+        if(core != null) {
+            calcDir(core);
+        }
     }
     
-    protected void initEnemy(double maxHealth, double damage, double attackSpeed, double range, double size, int speed) {
+    protected final void initEnemy(double maxHealth, double damage, double attackSpeed, int range, int speed, double size, Color color) {
         statsManager.init(maxHealth, damage, attackSpeed);
         this.speed = speed;
         this.range = range;
         this.size = size;
+        this.color = color;
+    }
+    
+    /**
+     * 
+     * @param chance
+     * Chance from 0 to 100% for this enemy to spawn.
+     * This chance is used to calculate the enemy's weight.
+     * @param cost 
+     * How much the enemy costs for it to spawn.
+     */
+    protected final void initWeight(double chance, int cost) {
+        this.chance = chance;
+        this.cost = cost;
     }
     
     public void move(double deltaTime, World w) {
@@ -66,8 +97,8 @@ public class Enemy {
         }
     }
     
-    private void calcDir() {
-        double angle = Math.atan2(core.getY()+1 - y, core.getX()+1 - x);
+    private void calcDir(Block block) {
+        double angle = Math.atan2(block.getCenterY() - y, block.getCenterX() - x);
         xDir = Math.cos(angle);
         yDir = Math.sin(angle);
     }
@@ -145,6 +176,22 @@ public class Enemy {
     public StatsManager getStatsManager() {
         return statsManager;
     }
+
+    public double getChance() {
+        return chance;
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
     
     public void draw(Camera c) {
         // Enemy debug
@@ -155,7 +202,7 @@ public class Enemy {
 //        }
         // c.drawRect(Math.round(x) - WorldManager.ENEMY_BUILD_DIST, Math.round(y) - WorldManager.ENEMY_BUILD_DIST, WorldManager.ENEMY_BUILD_DIST*2+1, WorldManager.ENEMY_BUILD_DIST*2+1, Color.yellow); // Forbidden build area
         // c.drawRect(x + size/2, y + size/2, size, size, Color.GREEN); // Draw a square around the enemy
-        c.fillCircle(x + size/2, y + size/2, size, Color.RED);
+        c.fillCircle(x + size/2, y + size/2, size, color);
     }
     
 }

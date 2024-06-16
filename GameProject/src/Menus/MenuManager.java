@@ -93,6 +93,10 @@ public class MenuManager {
                 }
             }
         }
+            
+        if(alBuildingBlocks.isEmpty()) {
+            System.err.println("ERROR: No building blocks were found!");
+        }
     }
     
     public void draw(Graphics g) {
