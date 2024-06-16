@@ -87,32 +87,44 @@ public class World {
      * @param deltaTime 
      */
     public void updatePlannedBlocks(double deltaTime) {
-        for(int i = alPlannedBlocks.size()-1; i >= 0; i--) {
+        int maxIndex = Math.min(alPlannedBlocks.size(), WorldManager.SIMUL_BD_COUNT);
+        
+        for(int i = 0; i < maxIndex; i++) {
             PlannedBlock plannedBlock = alPlannedBlocks.get(i);
-            
-            if(plannedBlock.getState() == 0) { // construction
-                if(plannedBlock.getBlock().isDestructing()) {
-                    alPlannedBlocks.remove(i);
-                } else {
-                    plannedBlock.regenerateBlock(deltaTime);
-                    if(plannedBlock.update(deltaTime)) {
-                        plannedBlock.getBlock().completeBuilding();
-                        alPlannedBlocks.remove(i);
-                    }
-                }
-            } else { // destruction
+
+            if(updatePlannedBlock(plannedBlock, deltaTime)) {
+                alPlannedBlocks.remove(i);
+                i--;
+                maxIndex--;
+            }
+        }
+    }
+    
+    private boolean updatePlannedBlock(PlannedBlock plannedBlock, double deltaTime) {
+        boolean result = false;
+        if(plannedBlock.getState() == 0) { // construction
+            if(plannedBlock.getBlock().isDestructing()) {
+                result = true;
+            } else {
+                plannedBlock.regenerateBlock(deltaTime);
                 if(plannedBlock.update(deltaTime)) {
-                    Block block = plannedBlock.getBlock();
-                    
-                    if(block != null) {
-                        refundBlock(block);
-                    }
-                    
-                    alPlannedBlocks.remove(i);
+                    plannedBlock.getBlock().completeBuilding();
+                    result = true;
                 }
             }
-            
+        } else { // destruction
+            if(plannedBlock.update(deltaTime)) {
+                Block block = plannedBlock.getBlock();
+
+                if(block != null) {
+                    refundBlock(block);
+                }
+
+                result = true;
+            }
         }
+        
+        return result;
     }
     
     /**

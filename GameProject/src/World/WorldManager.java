@@ -8,7 +8,6 @@ import Blocks.Nodes.CopperNode;
 import Blocks.Base.Core;
 import Blocks.Nodes.IronNode;
 import Blocks.Base.Node;
-import Blocks.Base.UpdatedBlock;
 import Core.Camera;
 import Core.MainLogic;
 import Enemies.Base.EnemyManager;
@@ -34,6 +33,10 @@ public class WorldManager {
     public final static int FONT_SIZE = 16;
     public final static int ENEMY_BUILD_DIST = 1;
     public static int WORLD_SIZE_X, WORLD_SIZE_Y;
+    /**
+     * How many block can be build/destructed simultaneously
+     */
+    public final static int SIMUL_BD_COUNT = 3;
     
     private World world;
     private EnemyManager enemyManager;

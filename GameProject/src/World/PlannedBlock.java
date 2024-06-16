@@ -12,31 +12,24 @@ import Blocks.Base.Block;
  */
 public class PlannedBlock {
     private Block block;
-    private double curCooldown;
-    private double maxCooldown = 1;
     private int state;
 
     public PlannedBlock(Block block, int state) {
         this.block = block;
-        maxCooldown = block.getBuildTime();
         
         if(state == 0) {
-            this.curCooldown = maxCooldown;
             block.build();
         } else {
-            this.curCooldown = 0;
             block.destruct();
         }
         this.state = state;
     }
     
     public boolean update(double deltaTime) {
-        if(state == 0) {
-            curCooldown -= deltaTime;
-            return curCooldown <= 0;
-        } else {
-            curCooldown += deltaTime;
-            return curCooldown >= maxCooldown; 
+        if(state == 0) { // construction
+            return block.updateBuildProgress(0, deltaTime);
+        } else { // destruction
+            return block.updateBuildProgress(1, deltaTime);
         }
     }
 
@@ -49,6 +42,6 @@ public class PlannedBlock {
     }
     
     public void regenerateBlock(double deltaTime) {
-        block.getStatsManager().hiddenRegen(deltaTime / maxCooldown);
+        block.getStatsManager().hiddenRegen(deltaTime / block.getBuildTime());
     }
 }

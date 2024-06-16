@@ -22,7 +22,10 @@ import java.util.HashMap;
 public class Block {
     protected int x, y;
     protected int width, height;
-    protected double buildTime;
+    private double buildTime;
+    private double buildProgress;
+    private double maxBuildProgress;
+    private double buildAnimPerc = 1.0;
     protected Color color1;
     protected Color color2;
     protected StatsManager statsManager;
@@ -37,10 +40,8 @@ public class Block {
     private final double healthBarHeight = 5.0 / WorldManager.BLOCK_SIZE;
     
     private boolean isBuilding = false;
-    private double buildAnimTime = 1.0;
     private Color buildColor = new Color(64, 224, 208, 128);
     private boolean isDestructing = false;
-    private double destructAnimTime = 0;
     private Color destructColor = new Color(224, 64, 80, 128);
     
     private Polygon polygon = new Polygon();
@@ -92,15 +93,12 @@ public class Block {
     }
     
     public final void drawBuildingOverlay(Camera c) {
-        buildAnimTime -= c.getDrawDeltaTime() / buildTime;
-        
-        c.fillRect(x + width/2.0*(1 - buildAnimTime), y + height/2.0*(1 - buildAnimTime), width * buildAnimTime, height * buildAnimTime, buildColor);
+        c.fillRect(x + width/2.0*(1 - buildAnimPerc), y + height/2.0*(1 - buildAnimPerc), width*buildAnimPerc, height*buildAnimPerc, buildColor);
     }
     
     public final void drawDestructOverlay(Camera c) {
-        destructAnimTime += c.getDrawDeltaTime() / buildTime;
-        
-        c.fillRect(x + width/2.0*(1 - destructAnimTime), y + height/2.0*(1 - destructAnimTime), width * destructAnimTime, height * destructAnimTime, destructColor);
+        c.fillRect(x + width/2.0*(1 - buildAnimPerc), y + height/2.0*(1 - buildAnimPerc), width*buildAnimPerc, height*buildAnimPerc, destructColor);
+        c.drawRect(x, y, width, height, Color.RED);
     }
     
     public final void drawIcon(Graphics g, int x, int y, int size) {
@@ -128,14 +126,6 @@ public class Block {
         deleted = true;
     }
     
-    /**
-     * Add a node to the allowed list, which forces this block to be placed on this node.
-     * @param pClass 
-     */
-    protected void addAllowedNode(Class<? extends Node> pClass) {
-        alAllowedNodes.add(pClass);
-    }
-    
     protected void initBlock(String name, double buildTime, double maxHealth, int width, int height, Color color) {
         initBlock(name, buildTime, maxHealth, width, height, color, color);
     }
@@ -151,9 +141,30 @@ public class Block {
         this.color2 = color2;
     }
     
+    /**
+     * Add a node to the allowed list, which forces this block to be placed on this node.
+     * @param pClass 
+     */
+    protected void addAllowedNode(Class<? extends Node> pClass) {
+        alAllowedNodes.add(pClass);
+    }
+    
     protected void addNeededItem(ItemType itemType, int quantity) {
         if(quantity > 0) {
             hmNeededItems.put(itemType, quantity);
+        }
+    }
+    
+    public final boolean updateBuildProgress(int state, double deltaTime) {
+        if(state == 0) {
+            buildAnimPerc -= deltaTime / buildTime;
+            buildProgress = Math.min(buildProgress+deltaTime, buildTime);
+            maxBuildProgress = buildTime/buildProgress;
+            return buildProgress >= buildTime;
+        } else {
+            buildAnimPerc += deltaTime / buildTime;
+            buildProgress = Math.max(buildProgress-deltaTime, 0);
+            return buildProgress <= 0;
         }
     }
     
@@ -324,6 +335,10 @@ public class Block {
 
     public double getBuildTime() {
         return buildTime;
+    }
+
+    public double getBuildProgress() {
+        return buildProgress;
     }
 
     public StatsManager getStatsManager() {
