@@ -43,6 +43,7 @@ public class DetailsMenu {
         alDetailsString.add("<title>General");
         alDetailsString.add(addNumber("Health:", block.getStatsManager().getMaxHealth()));
         alDetailsString.add("Size:" + block.getWidth() + "x" + block.getHeight());
+        alDetailsString.add(addNumber("Build Time:", block.getBuildTime()) + " seconds");
         
         String[] costsArr = Inventory.formatList(block.getHmNeededItems());
         if(costsArr.length > 0) {

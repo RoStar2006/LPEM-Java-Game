@@ -30,7 +30,7 @@ public class Splitter extends UpdatedBlock {
         super(x, y);
         setDirection(new Point(0, -1));
         setExitArrowStyle(false);
-        initBlock("Splitter", 20, 1, 1, Color.MAGENTA, Color.DARK_GRAY);
+        initBlock("Splitter", 0.15, 20, 1, 1, Color.MAGENTA, Color.DARK_GRAY);
         setBlockType(BlockType.ItemLogistic);
         createInventory(1, 1, false);
     }

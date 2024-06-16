@@ -15,7 +15,7 @@ public class MinerMK1 extends NodeCollector {
     
     public MinerMK1(int x, int y) {
         super(x, y);
-        initBlock("Miner MK1", 200, 1, 1, Color.RED, Color.LIGHT_GRAY);
+        initBlock("Miner MK1", 1, 200, 1, 1, Color.RED, Color.LIGHT_GRAY);
         setMiningSpeed(60);
     }
     

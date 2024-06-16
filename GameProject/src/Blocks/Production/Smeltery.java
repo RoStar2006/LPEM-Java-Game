@@ -17,7 +17,7 @@ public class Smeltery extends RecipeBlock {
     
     public Smeltery(int x, int y) {
         super(x, y);
-        initBlock("Smeltery", 150, 1, 1, Color.ORANGE, new Color(255,114,118));
+        initBlock("Smeltery", 1.25, 150, 1, 1, Color.ORANGE, new Color(255,114,118));
         addRecipe(new HashMap<>(){{put(ItemType.IronOre, 1);}}, new HashMap<>(){{put(ItemType.IronIngot, 1);}}, 2);
         addRecipe(new HashMap<>(){{put(ItemType.CopperOre, 1);}}, new HashMap<>(){{put(ItemType.CopperIngot, 1);}}, 2);
     }

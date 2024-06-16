@@ -27,7 +27,7 @@ public abstract class UpdatedBlock extends Block {
     
     public UpdatedBlock(int x, int y) {
         super(x, y);
-        initBlock("Updated Block", 0, 1, 1, Color.YELLOW);
+        initBlock("Updated Block", 1, 0, 1, 1, Color.YELLOW);
     }
     
     /**

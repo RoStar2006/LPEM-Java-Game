@@ -28,7 +28,7 @@ public class ConveyorBelt extends UpdatedBlock {
     public ConveyorBelt(int x, int y) {
         super(x, y);
         setDirection(new Point(0, -1));
-        initBlock("Conveyor belt", 15, 1, 1, Color.GREEN, Color.MAGENTA);
+        initBlock("Conveyor belt", 0.01, 15, 1, 1, Color.GREEN, Color.MAGENTA);
         setBlockType(BlockType.ItemLogistic);
         createInventory(maxItems, maxItems, false);
     }

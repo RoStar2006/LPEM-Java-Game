@@ -41,7 +41,7 @@ public class Turret extends UpdatedBlock {
     public Turret(int x, int y) {
         super(x, y);
         setBlockType(BlockType.Tower);
-        initBlock("Tower", 200, 1, 1, Color.WHITE, Color.ORANGE);
+        initBlock("Tower", 1.5, 200, 1, 1, Color.WHITE, Color.ORANGE);
         initTower(Projectile.class, 0.5, 0, 12, 0, 1);
     }
     

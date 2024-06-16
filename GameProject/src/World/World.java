@@ -7,7 +7,6 @@ package World;
 import Blocks.Base.Core;
 import Blocks.Base.Block;
 import Blocks.Base.BlockType;
-import Blocks.Base.ConveyorBelt;
 import Blocks.Base.Node;
 import Blocks.Base.NodeCollector;
 import Blocks.Base.RecipeBlock;

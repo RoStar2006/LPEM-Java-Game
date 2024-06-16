@@ -28,7 +28,7 @@ public class RecipeBlock extends UpdatedBlock {
         super(x, y);
         setBlockType(BlockType.RecipeBlock);
         setDirection(new Point(0, -1));
-        initBlock("Recipe Block", 50, 1, 1, Color.WHITE);
+        initBlock("Recipe Block", 1.5, 50, 1, 1, Color.WHITE);
         createInventory(20, 1, false);
         resultInventory = new Inventory(20, 1, true);
         

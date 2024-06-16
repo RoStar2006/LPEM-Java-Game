@@ -21,7 +21,7 @@ public class NodeCollector extends UpdatedBlock {
     
     public NodeCollector(int x, int y) {
         super(x, y);
-        initBlock("Node collector", 250, 1, 1, Color.PINK);
+        initBlock("Node collector", 1, 250, 1, 1, Color.PINK);
         setBlockType(BlockType.NodeCollector);
         createInventory(20, 1, true);
         addAllowedNode(Node.class);

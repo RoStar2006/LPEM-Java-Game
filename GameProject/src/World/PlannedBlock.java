@@ -13,11 +13,13 @@ import Blocks.Base.Block;
 public class PlannedBlock {
     private Block block;
     private double curCooldown;
-    private final double maxCooldown = 1;
+    private double maxCooldown = 1;
     private int state;
 
     public PlannedBlock(Block block, int state) {
         this.block = block;
+        maxCooldown = block.getBuildTime();
+        
         if(state == 0) {
             this.curCooldown = maxCooldown;
             block.build();

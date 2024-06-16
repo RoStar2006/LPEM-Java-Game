@@ -17,7 +17,7 @@ public class Wall extends Block {
     
     public Wall(int x, int y) {
         super(x, y);
-        initBlock("Wall", 50, 1, 1, Color.BLUE, Color.LIGHT_GRAY);
+        initBlock("Wall", 0.75, 50, 1, 1, Color.BLUE, Color.LIGHT_GRAY);
         setBlockType(BlockType.Wall);
     }
 }

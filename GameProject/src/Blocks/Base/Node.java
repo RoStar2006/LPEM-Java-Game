@@ -20,7 +20,7 @@ public class Node extends Block {
     }
 
     protected void initNode(String name, Color color, ItemType collectableResource) {
-        super.initBlock(name, 0, 1, 1, color);
+        super.initBlock(name, 0, 0, 1, 1, color);
         setCollectableResource(collectableResource);
     }
     

@@ -22,6 +22,7 @@ import java.util.HashMap;
 public class Block {
     protected int x, y;
     protected int width, height;
+    protected double buildTime;
     protected Color color1;
     protected Color color2;
     protected StatsManager statsManager;
@@ -91,13 +92,13 @@ public class Block {
     }
     
     public final void drawBuildingOverlay(Camera c) {
-        buildAnimTime -= c.getDrawDeltaTime();
+        buildAnimTime -= c.getDrawDeltaTime() / buildTime;
         
         c.fillRect(x + width/2.0*(1 - buildAnimTime), y + height/2.0*(1 - buildAnimTime), width * buildAnimTime, height * buildAnimTime, buildColor);
     }
     
     public final void drawDestructOverlay(Camera c) {
-        destructAnimTime += c.getDrawDeltaTime();
+        destructAnimTime += c.getDrawDeltaTime() / buildTime;
         
         c.fillRect(x + width/2.0*(1 - destructAnimTime), y + height/2.0*(1 - destructAnimTime), width * destructAnimTime, height * destructAnimTime, destructColor);
     }
@@ -135,14 +136,15 @@ public class Block {
         alAllowedNodes.add(pClass);
     }
     
-    protected void initBlock(String name, double maxHealth, int width, int height, Color color) {
-        initBlock(name, maxHealth, width, height, color, color);
+    protected void initBlock(String name, double buildTime, double maxHealth, int width, int height, Color color) {
+        initBlock(name, buildTime, maxHealth, width, height, color, color);
     }
     
-    protected void initBlock(String name, double maxHealth, int width, int height, Color color1, Color color2) {
+    protected void initBlock(String name, double buildTime, double maxHealth, int width, int height, Color color1, Color color2) {
         this.name = name;
         statsManager.init(maxHealth);
         statsManager.setBlock(this);
+        this.buildTime = buildTime;
         this.height = height;
         this.width = width;
         this.color1 = color1;
@@ -318,6 +320,10 @@ public class Block {
 
     public String getName() {
         return name;
+    }
+
+    public double getBuildTime() {
+        return buildTime;
     }
 
     public StatsManager getStatsManager() {
