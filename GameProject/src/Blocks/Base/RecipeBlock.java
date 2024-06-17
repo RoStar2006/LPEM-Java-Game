@@ -58,7 +58,7 @@ public class RecipeBlock extends UpdatedBlock {
         UpdatedBlock updatedBlock = getInputBlock(world, getDirection().x, getDirection().y);
         if(!getResultInventory().isEmpty() && updatedBlock != null) { // Check if any items needs to be transported and a receiving block is available
             for(Map.Entry<ItemType, Integer> entry : getResultInventory().entrySet()) {
-                int newQuantity = updatedBlock.addItem(entry.getKey(), entry.getValue());
+                int newQuantity = updatedBlock.addItem(entry.getKey(), entry.getValue(), this);
                 getRawResultInventory().removeItem(entry.getKey(), entry.getValue()-newQuantity);
             }
         }

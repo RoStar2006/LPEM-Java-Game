@@ -54,7 +54,7 @@ public class ConveyorBelt extends UpdatedBlock {
         
         UpdatedBlock updatedBlock = getInputBlock(world, getDirection().x, getDirection().y);
         if(!alItemOrder.isEmpty() && alItemTime.get(0) <= 0 && updatedBlock != null) { // Check if any items needs to be transported, if the tranfer time reached 0 and a receiving block is available
-            int newQuantity = updatedBlock.addItem(alItemOrder.get(0), 1);
+            int newQuantity = updatedBlock.addItem(alItemOrder.get(0), 1, this);
             if(newQuantity == 0) {
                 removeItem(alItemOrder.get(0), 1);
                 alItemOrder.remove(0);
@@ -86,7 +86,7 @@ public class ConveyorBelt extends UpdatedBlock {
     }
 
     @Override
-    public int addItem(ItemType itemType, int quantity) {
+    public int addItem(ItemType itemType, int quantity, UpdatedBlock block) {
         if(alItemOrder.size() >= 4 || curCooldown > 0) {
             return quantity;
         }
@@ -94,7 +94,7 @@ public class ConveyorBelt extends UpdatedBlock {
         alItemOrder.add(itemType);
         alItemTime.add(traverseTime);
         
-        return quantity-1 + super.addItem(itemType, 1);
+        return quantity-1 + super.addItem(itemType, 1, block);
     }
     
     /**

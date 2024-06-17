@@ -192,17 +192,17 @@ public class World {
     
     private void refundBlock(Block block) {
         for(Map.Entry<ItemType, Integer> entry : block.getHmNeededItems().entrySet()) { // refund the old items
-            core.addItem(entry.getKey(), entry.getValue());
+            core.addItem(entry.getKey(), entry.getValue(), null);
         }
         
         if(block instanceof UpdatedBlock updatedBlock) { // add the inventory to the core
             for(Map.Entry<ItemType, Integer> entry : updatedBlock.getInventory().entrySet()) { // refund the old items
-                core.addItem(entry.getKey(), entry.getValue());
+                core.addItem(entry.getKey(), entry.getValue(), null);
             }
             
             if(updatedBlock instanceof RecipeBlock recipeBlock) {
                 for(Map.Entry<ItemType, Integer> entry : recipeBlock.getResultInventory().entrySet()) { // refund the old items
-                    core.addItem(entry.getKey(), entry.getValue());
+                    core.addItem(entry.getKey(), entry.getValue(), null);
                 }
             }
         }

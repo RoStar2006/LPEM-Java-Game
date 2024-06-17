@@ -47,7 +47,7 @@ public class Splitter extends UpdatedBlock {
             if(!(p.x == -getDirection().x && p.y == -getDirection().y)) {
                 UpdatedBlock updatedBlock = getInputBlock(world, p.x, p.y);
                 if(updatedBlock != null) {
-                    int newQuantity = updatedBlock.addItem(curItemType, 1);
+                    int newQuantity = updatedBlock.addItem(curItemType, 1, this);
                     if(newQuantity == 0) {
                         removeItem(curItemType, 1);
                         curItemType = null;
@@ -69,8 +69,8 @@ public class Splitter extends UpdatedBlock {
     }
     
     @Override
-    public int addItem(ItemType itemType, int quantity) {
-        int newQuantity = super.addItem(itemType, quantity);
+    public int addItem(ItemType itemType, int quantity, UpdatedBlock block) {
+        int newQuantity = super.addItem(itemType, quantity, block);
         
         if(newQuantity < quantity) {
             curItemType = itemType;

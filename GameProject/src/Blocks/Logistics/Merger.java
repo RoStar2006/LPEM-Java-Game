@@ -34,7 +34,7 @@ public class Merger extends UpdatedBlock {
         UpdatedBlock updatedBlock = getInputBlock(world, getDirection().x, getDirection().y);
         if(updatedBlock != null) {
             ItemType itemType = (ItemType)getInventory().keySet().toArray()[0];
-            int newQuantity = updatedBlock.addItem(itemType, 1);
+            int newQuantity = updatedBlock.addItem(itemType, 1, this);
             if(newQuantity == 0) {
                 removeItem(itemType, 1);
             }

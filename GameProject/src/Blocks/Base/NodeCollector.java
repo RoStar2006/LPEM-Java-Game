@@ -50,7 +50,7 @@ public class NodeCollector extends UpdatedBlock {
 
                     if(updatedBlock  != null) {
                         for(Map.Entry<ItemType, Integer> entry : getInventory().entrySet()) {
-                            int newQuantity = updatedBlock.addItem(entry.getKey(), entry.getValue());
+                            int newQuantity = updatedBlock.addItem(entry.getKey(), entry.getValue(), this);
                             if(newQuantity != -1 || newQuantity == entry.getValue()) {
                                 removeItem(entry.getKey(), entry.getValue()-newQuantity);
                             }

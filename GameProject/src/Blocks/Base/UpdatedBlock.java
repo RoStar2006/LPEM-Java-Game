@@ -174,7 +174,7 @@ public abstract class UpdatedBlock extends Block {
      * @param quantity
      * @return The output of the {@link Inventory#addItem(Items.Item, int)} method or -1 if not inventory exists.
      */
-    public int addItem(ItemType itemType, int quantity) {
+    public int addItem(ItemType itemType, int quantity, UpdatedBlock block) {
         if(inventory == null) {
             return -1;
         } else if(inventory.isOutputOnly()) {
