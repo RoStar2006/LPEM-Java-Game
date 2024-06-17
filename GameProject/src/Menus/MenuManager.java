@@ -5,6 +5,7 @@
 package Menus;
 
 import Blocks.Base.*;
+import Blocks.Logistics.Junction;
 import Core.Camera;
 import Core.MainLogic;
 import Core.Utils;
@@ -81,6 +82,13 @@ public class MenuManager {
     public void init(BuildManager buildManager, World world) {
         this.buildManager = buildManager;
         this.world = world;
+        
+        for(Block block : hmBuildingBlocks.get(BlockType.ItemLogistic)) {
+            if(block instanceof Junction junction) {
+                buildManager.setJunction(junction);
+                break;
+            }
+        }
     }
     
     /**

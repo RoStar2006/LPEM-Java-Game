@@ -5,7 +5,9 @@
 package World;
 
 import Blocks.Base.Block;
+import Blocks.Base.ConveyorBelt;
 import Blocks.Base.UpdatedBlock;
+import Blocks.Logistics.Junction;
 import Core.Camera;
 import java.awt.Color;
 import java.awt.Point;
@@ -22,6 +24,7 @@ public class BuildManager {
     private final Color placeColor = new Color(245, 245, 245, 126);
     private final Color removeColor = Color.RED;
     private Block selectedBlock;
+    private Junction junction;
     private final static Class[] paramTypesSub = { int.class, int.class }; // The costructor template for the block creation
     private final static Object [] paramValuesSub = {0, 0}; // Dummy value, are replaced when the block object is successfully created
     
@@ -76,6 +79,7 @@ public class BuildManager {
         if(placeStartPoint != null) { // Draw preview blocks for the placement
             double xSize = c.getMouseToWorldPosX() - placeStartPoint.x;
             double ySize = c.getMouseToWorldPosY() - placeStartPoint.y;
+            boolean multiPlace = Math.abs(xSize) > 1 || Math.abs(ySize) > 1;
             
             if(Math.abs(xSize) >= Math.abs(ySize)) {
                 int xSign = (int)Math.signum(xSize);
@@ -85,7 +89,7 @@ public class BuildManager {
                 }
                 
                 for(int i = 0; i <= Math.abs(xSize); i += selectedBlock.getWidth()) { // draw block
-                    drawSelectedBlock(c, selectedBlock, (int)Math.round(placeStartPoint.x+i*xSign - selectedBlock.getWidth()/2.0), (int)Math.round(placeStartPoint.y - selectedBlock.getHeight()/2.0), i/selectedBlock.getWidth()+1);
+                    drawSelectedBlock(c, selectedBlock, (int)Math.round(placeStartPoint.x+i*xSign - selectedBlock.getWidth()/2.0), (int)Math.round(placeStartPoint.y - selectedBlock.getHeight()/2.0), i/selectedBlock.getWidth()+1, rotatedBlock, multiPlace);
                 }
             } else {
                 int ySign = (int)Math.signum(ySize);
@@ -95,11 +99,11 @@ public class BuildManager {
                 }
                 
                 for(int i = 0; i <= Math.abs(ySize); i += selectedBlock.getHeight()) { // draw block
-                    drawSelectedBlock(c, selectedBlock, (int)Math.round(placeStartPoint.x - selectedBlock.getWidth()/2.0), (int)Math.round(placeStartPoint.y+i*ySign - selectedBlock.getHeight()/2.0), i/selectedBlock.getHeight()+1);
+                    drawSelectedBlock(c, selectedBlock, (int)Math.round(placeStartPoint.x - selectedBlock.getWidth()/2.0), (int)Math.round(placeStartPoint.y+i*ySign - selectedBlock.getHeight()/2.0), i/selectedBlock.getHeight()+1, rotatedBlock, multiPlace);
                 }
             }
         } else { // draw a single block under the mouse cursor
-            drawSelectedBlock(c, selectedBlock, (int)Math.round(c.getMouseToWorldPosX() - selectedBlock.getWidth()/2.0), (int)Math.round(c.getMouseToWorldPosY() - selectedBlock.getHeight()/2.0), 1);
+            drawSelectedBlock(c, selectedBlock, (int)Math.round(c.getMouseToWorldPosX() - selectedBlock.getWidth()/2.0), (int)Math.round(c.getMouseToWorldPosY() - selectedBlock.getHeight()/2.0), 1, rotatedBlock, false);
         }
         
         if(updatedBlock != null && updatedBlock.hasDirection()) { // draw the arrow when placing conveyor belts
@@ -134,7 +138,9 @@ public class BuildManager {
         c.drawLine(cX+xSize/2, cY-yOffset, cX+xSize, cY, arrowThickness, arrowColor);
     }
     
-    private void drawSelectedBlock(Camera c, Block b, int x, int y, int count) {
+    private void drawSelectedBlock(Camera c, Block b, int x, int y, int count, boolean rotatedBlock, boolean multiPlace) {
+        b = getFilteredBlock(x, y, rotatedBlock, multiPlace);
+        
         b.setPos(x, y);
         b.draw(c, true);
         b.drawHovered(c);
@@ -154,23 +160,24 @@ public class BuildManager {
         if(selectedBlock != null && placeStartPoint != null) { // Place block
             double xSize = c.getMouseToWorldPosX() - placeStartPoint.x;
             double ySize = c.getMouseToWorldPosY() - placeStartPoint.y;
+            boolean multiPlace = Math.abs(xSize) > 1 || Math.abs(ySize) > 1;
             
             if(Math.abs(xSize) >= Math.abs(ySize)) {
                 int sign = (int)Math.signum(xSize);
                 for(int i = 0; i <= Math.abs(xSize); i++) {
-                    placeBlock(placeStartPoint.x+i*sign, placeStartPoint.y);
+                    placeBlock(placeStartPoint.x+i*sign, placeStartPoint.y, rotatedBlock, multiPlace);
                 }
             } else {
                 int sign = (int)Math.signum(ySize);
                 for(int i = 0; i <= Math.abs(ySize); i++) {
-                    placeBlock(placeStartPoint.x, placeStartPoint.y+i*sign);
+                    placeBlock(placeStartPoint.x, placeStartPoint.y+i*sign, rotatedBlock, multiPlace);
                 }
             }
         }
     }
     
-    private void placeBlock(double x, double y) {
-        Block b = createBlock(selectedBlock.getClass());
+    private void placeBlock(double x, double y, boolean rotatedBlock, boolean multiPlace) {
+        Block b = createBlock(getFilteredBlock((int)x, (int)y, rotatedBlock, multiPlace).getClass());
         
         if(b != null) {
             b.setPos((int)Math.round(x - b.getWidth()/2.0), (int)Math.round(y - b.getHeight()/2.0)); // Set the real block pos
@@ -214,8 +221,27 @@ public class BuildManager {
         Getters and setters
     */
     
+    private Block getFilteredBlock(int x, int y, boolean rotatedBlock, boolean multiPlace) {
+        if(multiPlace && !rotatedBlock && junction != null) {
+            Block wBlock = world.getBlock(x, y);
+            if((selectedBlock instanceof ConveyorBelt conveyorBelt) && (wBlock instanceof ConveyorBelt worldConveyorBelt)) {
+                if(conveyorBelt.getDirection().x*worldConveyorBelt.getDirection().x == conveyorBelt.getDirection().y*worldConveyorBelt.getDirection().y) { // Check if 2 conveyor belts are intersecting
+                    return junction;
+                }
+            } else if(wBlock instanceof Junction) {
+                return junction;
+            }
+        }
+        
+        return selectedBlock;
+    }
+    
     public void setSelectedBlock(Block selectedBlock) {
         this.selectedBlock = selectedBlock;
+    }
+
+    public void setJunction(Junction junction) {
+        this.junction = junction;
     }
     
     public Point getNextDirection(Point currentDirection, boolean turnLeft) {
