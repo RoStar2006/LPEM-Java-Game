@@ -18,7 +18,7 @@ public class BigWall extends Block {
     
     public BigWall(int x, int y) {
         super(x, y);
-        initBlock("Big Wall", 2.5, 250, 2, 2, Color.BLUE, Color.DARK_GRAY);
+        initBlock("Big Wall", 2.5, 1600, 2, 2, Color.BLUE, Color.DARK_GRAY);
         setBlockType(BlockType.Wall);
         addNeededItem(ItemType.IronOre, 4);
     }
