@@ -57,6 +57,10 @@ public class EnemyManager {
         initEnemies();
     }
     
+    /**
+     * This method uses the ClassGraph library to collect every available enemy
+     * https://repo1.maven.org/maven2/io/github/classgraph/classgraph/
+     */
     private void initEnemies() {
         try (ScanResult scanResult = new ClassGraph().acceptPackages("Enemies").enableClassInfo().scan()) {
             List<Class<Enemy>> alEnemyClasses = scanResult.getSubclasses(Enemy.class.getName()).loadClasses(Enemy.class);

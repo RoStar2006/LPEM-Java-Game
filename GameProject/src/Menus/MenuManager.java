@@ -83,6 +83,10 @@ public class MenuManager {
         this.world = world;
     }
     
+    /**
+     * This method uses the ClassGraph library to collect every available block
+     * https://repo1.maven.org/maven2/io/github/classgraph/classgraph/
+     */
     private void initBuildingBlocks() {
         try (ScanResult scanResult = new ClassGraph().acceptPackages("Blocks").enableClassInfo().scan()) {
             List<Class<Block>> alBlockClasses = scanResult.getSubclasses(Block.class.getName()).loadClasses(Block.class);

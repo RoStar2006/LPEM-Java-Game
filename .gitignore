@@ -28,3 +28,4 @@ replay_pid*
 /GameProject/nbproject/private/
 /GameProject/build/
 /GameProject/dist/
+!/GameProject/lib/*
