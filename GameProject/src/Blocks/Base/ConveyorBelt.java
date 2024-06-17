@@ -75,8 +75,10 @@ public class ConveyorBelt extends UpdatedBlock {
         double cY = y+height/2.0;
         for(int i = alItemTime.size()-1; i >= 0; i--) {
             if (i < alItemTime.size()) {
-                double offsetTime = (traverseTime/2 - alItemTime.get(i))/traverseTime;
-                ItemDrawer.drawItem(c, alItemOrder.get(i), cX+getDirection().x*offsetTime, cY+getDirection().y*offsetTime, size);
+                if(alItemTime.get(i) != null) {
+                    double offsetTime = (traverseTime/2 - alItemTime.get(i))/traverseTime;
+                    ItemDrawer.drawItem(c, alItemOrder.get(i), cX+getDirection().x*offsetTime, cY+getDirection().y*offsetTime, size);
+                }
             } else {
                 i = alItemOrder.size()-1;
             }
