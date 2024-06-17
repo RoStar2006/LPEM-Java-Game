@@ -20,6 +20,7 @@ import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,16 +38,17 @@ public class MenuManager {
     */
     private final int bIconSize = 32;
     private final int bPadding = 3;
+    private final int bPaddedIconSize = bIconSize + bPadding;
     private final int bXItemCount = 4;
     private final int bYItemCount = 5;
     private final int bFontSize = 16;
     private int scroll = 0;
     
-    private final int bMenuWidth = (bIconSize + bPadding) * bXItemCount + bPadding;
-    private final int bMenuHeight = (bIconSize + bPadding) * bYItemCount + bPadding;
+    private final int bMenuWidth = bPaddedIconSize * (bXItemCount+1) + bPadding;
+    private final int bMenuHeight = bPaddedIconSize * bYItemCount + bPadding;
     private final int bMenuX = MainLogic.SCREEN_RES.x - bMenuWidth;
     private final int bMenuY = MainLogic.SCREEN_RES.y - bMenuHeight;
-    private final int bMenuRows;
+    private final int bMenuCatX = MainLogic.SCREEN_RES.x - bPaddedIconSize;
     private int blockMenuHeight = 0;
     
     private final int detailsButtonSize = bFontSize;
@@ -56,9 +58,9 @@ public class MenuManager {
     
     private final Color bgLightColor = new Color(255, 255, 255, 64);
     private final Color bgDarkColor = new Color(0, 0, 0, 96);
-    private ArrayList<Block> alBuildingBlocks = new ArrayList<>();
+    private HashMap<BlockType, ArrayList<Block>> hmBuildingBlocks = new HashMap<>();
     private Block selectedBlock;
-    
+    private BlockType curBlockType;
     
     /*
         Build and placing
@@ -74,8 +76,6 @@ public class MenuManager {
         this.c = camera;
         
         initBuildingBlocks();
-
-        bMenuRows = (int)Math.ceil(alBuildingBlocks.size() / (double)bXItemCount);
     }
     
     public void init(BuildManager buildManager, World world) {
@@ -88,17 +88,30 @@ public class MenuManager {
      * https://repo1.maven.org/maven2/io/github/classgraph/classgraph/
      */
     private void initBuildingBlocks() {
+        boolean createdBlock = false;
+        for(int i = 1; i < BlockType.values().length; i++) {
+            if(i == 1) {
+                curBlockType = BlockType.values()[i];
+            }
+            hmBuildingBlocks.put(BlockType.values()[i], new ArrayList<>());
+        }
+        
         try (ScanResult scanResult = new ClassGraph().acceptPackages("Blocks").enableClassInfo().scan()) {
             List<Class<Block>> alBlockClasses = scanResult.getSubclasses(Block.class.getName()).loadClasses(Block.class);
             
             for(Class<Block> bC : alBlockClasses) {
                 if(!bC.getPackage().getName().contains("Base") && !bC.getPackage().getName().contains("Nodes")) {
-                    alBuildingBlocks.add(BuildManager.createBlock(bC));
+                    Block block = BuildManager.createBlock(bC);
+                    
+                    if(block != null) {
+                        createdBlock = true;
+                        hmBuildingBlocks.get(block.getBlockType()).add(block);
+                    }
                 }
             }
         }
-            
-        if(alBuildingBlocks.isEmpty()) {
+        
+        if(!createdBlock) {
             System.err.println("ERROR: No building blocks were found!");
         }
     }
@@ -115,6 +128,7 @@ public class MenuManager {
         buildManager.draw(c, placeStartPoint, rotatedBlock, removeStartPoint);
         
         drawBuildMenu(g);
+        drawCategoryMenu(g);
         drawHoveredBlock(g);
         
         if(detailsMenu != null) {
@@ -149,11 +163,11 @@ public class MenuManager {
         
         if(selectedBlock != null) {
             drawBlockMenu(g, selectedBlock);
-        } else if(c.getMouseX() >= bMenuX && c.getMouseY() >= bMenuY) {
+        } else if(c.getMouseX() >= bMenuX && c.getMouseX() < bMenuCatX && c.getMouseY() >= bMenuY) {
             int index = calulateBuildMenuIndex();
             
             if(index != -1) {
-                drawBlockMenu(g, alBuildingBlocks.get(index));
+                drawBlockMenu(g, getAlBuildingBlocks().get(index));
             }
         }
         
@@ -162,15 +176,24 @@ public class MenuManager {
         int x = 0;
         int y = scroll;
         
-        for(Block block : alBuildingBlocks) {
-            if(y <= 0) 
-                block.drawIcon(g, bMenuX + (bIconSize + bPadding) * x + bPadding, bMenuY - (bIconSize + bPadding) * y + bPadding, bIconSize);
+        for(Block block : getAlBuildingBlocks()) {
+            if(y <= 0) {
+                block.drawIcon(g, bMenuX + bPaddedIconSize * x + bPadding, bMenuY - bPaddedIconSize * y + bPadding, bIconSize);
+            }
             
             x++;
             if(x % bXItemCount == 0) {
                 x = 0;
                 y--;
             }
+        }
+    }
+    
+    private void drawCategoryMenu(Graphics g) {
+        for(int i = 1; i < BlockType.values().length; i++) {
+            BlockType blockType = BlockType.values()[i];
+            
+            BlockTypeDrawer.drawBlockType(g, blockType, bMenuCatX, bMenuY+bPadding+bPaddedIconSize*(i-1), bIconSize);
         }
     }
     
@@ -218,10 +241,20 @@ public class MenuManager {
     
     private int calulateBuildMenuIndex() {
         // Calculate on which item the user clicked
-        int xIndex = ((int)c.getMouseX() - bMenuX) / (bIconSize + bPadding);
-        int yIndex = ((int)c.getMouseY() - bMenuY) / (bIconSize + bPadding) + scroll;
+        int xIndex = ((int)c.getMouseX() - bMenuX) / bPaddedIconSize;
+        int yIndex = ((int)c.getMouseY() - bMenuY) / bPaddedIconSize + scroll;
         int index = yIndex * bXItemCount + xIndex;
-        if(index >= 0 && index < alBuildingBlocks.size()) {
+        if(index >= 0 && index < getAlBuildingBlocks().size()) {
+            return index;
+        } else {
+            return -1;
+        }
+    }
+    
+    private int calculateCategoryIndex() {
+        int index = ((int)c.getMouseY() - bMenuY) / bPaddedIconSize+1;
+        
+        if(index >= 1 && index < BlockType.values().length) {
             return index;
         } else {
             return -1;
@@ -238,8 +271,12 @@ public class MenuManager {
     }
     
     private void selectBlock(int index) {
-        selectedBlock = alBuildingBlocks.get(index);
+        selectedBlock = getAlBuildingBlocks().get(index);
         buildManager.setSelectedBlock(selectedBlock);
+    }
+    
+    private ArrayList<Block> getAlBuildingBlocks() {
+        return hmBuildingBlocks.get(curBlockType);
     }
     
     public boolean canInteract() {
@@ -264,11 +301,19 @@ public class MenuManager {
                         detailsMenu = new DetailsMenu(selectedBlock, bgDarkColor);
                     }
                     return;
-                }
-                
-                int index = calulateBuildMenuIndex();
-                if(index != -1) {
-                    selectBlock(index);
+                } else if(x >= bMenuCatX) { // Hovering over categories
+                    int index = calculateCategoryIndex();
+                    
+                    if(index != -1) {
+                        curBlockType = BlockType.values()[index];
+                    }
+                    
+                    return;
+                } else {
+                    int index = calulateBuildMenuIndex();
+                    if(index != -1) {
+                        selectBlock(index);
+                    }
                 }
             } else if(!leftClick) {
                 resetSelection();
@@ -333,6 +378,8 @@ public class MenuManager {
                 return false;
             }
         }
+        
+        int bMenuRows = (int)Math.ceil(getAlBuildingBlocks().size() / (double)bXItemCount);
         
         if(bMenuRows >= bYItemCount) {
             scroll += Math.signum(evt.getWheelRotation());

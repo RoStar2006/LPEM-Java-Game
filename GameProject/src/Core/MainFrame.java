@@ -119,15 +119,16 @@ public class MainFrame extends javax.swing.JFrame {
         mainLogic.getControls().keyInput(evt.getKeyCode(), true);
         if(evt.getKeyCode() == KeyEvent.VK_F8) {
             toggleTimerBased = !toggleTimerBased;
+            
             if(toggleTimerBased) {
                 drawTimer.start();
                 updateTimer.start();
-                gameThread.toggleUpdate(!toggleTimerBased);
             } else {
                 drawTimer.stop();
                 updateTimer.stop();
-                gameThread.toggleUpdate(!toggleTimerBased);
             }
+            
+            gameThread.toggleUpdate(!toggleTimerBased);
         }
     }//GEN-LAST:event_formKeyReleased
 
