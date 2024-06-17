@@ -103,7 +103,7 @@ public class MenuManager {
                 if(!bC.getPackage().getName().contains("Base") && !bC.getPackage().getName().contains("Nodes")) {
                     Block block = BuildManager.createBlock(bC);
                     
-                    if(block != null) {
+                    if(block != null && block.getBlockType() != BlockType.None) {
                         createdBlock = true;
                         hmBuildingBlocks.get(block.getBlockType()).add(block);
                     }
