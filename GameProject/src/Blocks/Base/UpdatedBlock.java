@@ -170,6 +170,7 @@ public abstract class UpdatedBlock extends Block {
     /**
      * This method accesses the {@link Inventory#addItem(Items.Item, int)} method. It only adds items if the inventory is not set to output only.
      * @see Inventory#addItem(Items.Item, int)
+     * @param block
      * @param itemType
      * @param quantity
      * @return The output of the {@link Inventory#addItem(Items.Item, int)} method or -1 if not inventory exists.

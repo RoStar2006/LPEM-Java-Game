@@ -17,7 +17,7 @@ public class Core extends UpdatedBlock {
     public Core(int x, int y) {
         super(x, y);
         initBlock("Core", 0, 1000, 3, 3, Color.BLUE, Color.CYAN);
-        createInventory(4000, 0, false);
+        createInventory(4000, -1, false);
         forceAddItem(ItemType.CopperOre, 20);
         forceAddItem(ItemType.IronOre, 20);
     }

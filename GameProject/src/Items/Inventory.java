@@ -60,7 +60,7 @@ public class Inventory {
      * This method returns -1 if an error occured like the given item not being in the whitelist.
      */
     public int addItem(ItemType itemType, int quantity) {
-        if(!isWhitelisted(itemType) || (maxSize > 0 && hmItems.size() >= maxSize && !hmItems.containsKey(itemType))) {
+        if(!isWhitelisted(itemType) || (maxSize >= 0 && hmItems.size() >= maxSize && !hmItems.containsKey(itemType))) {
             return -1;
         }
         
@@ -69,7 +69,7 @@ public class Inventory {
         curQuantity += quantity;
         quantity = 0;
         
-        if(curQuantity > maxStackSize && maxStackSize > 0) {
+        if(curQuantity > maxStackSize && maxStackSize >= 0) {
             quantity = curQuantity - maxStackSize;
             curQuantity = maxStackSize;
         }
