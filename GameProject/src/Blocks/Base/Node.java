@@ -13,6 +13,7 @@ import java.awt.Color;
  */
 public class Node extends Block {
     private ItemType collectableResource;
+    private double spawnsInChunk = 0;
     
     public Node(int x, int y) {
         super(x, y);
@@ -30,6 +31,14 @@ public class Node extends Block {
 
     public ItemType getCollectableResource() {
         return collectableResource;
+    }
+
+    public double getSpawnsInChunk() {
+        return spawnsInChunk;
+    }
+
+    protected void setSpawnsInChunk(double spawnsInChunk) {
+        this.spawnsInChunk = spawnsInChunk;
     }
     
 }
