@@ -56,12 +56,16 @@ public class MenuManager {
     private final int detailsButtonSize = bFontSize;
     private final int datailsSize = bFontSize;
     private final int detailsButtonX = bMenuX + bMenuWidth - bPadding - detailsButtonSize;
+    private final int detailsButtonTextOffset = 2;
     private int detailsButtonY = 0;
+    
+    private final int bHealthBarWidth = bMenuWidth - bPadding*2;
     
     private final Color bgLightColor = new Color(255, 255, 255, 64);
     private final Color bgDarkColor = new Color(0, 0, 0, 96);
     private HashMap<BlockType, ArrayList<Block>> hmBuildingBlocks = new HashMap<>();
     private Block selectedBlock;
+    private Block hoveredBlock;
     private BlockType curBlockType;
     
     /*
@@ -93,7 +97,7 @@ public class MenuManager {
     }
     
     /**
-     * This method uses the ClassGraph library to collect every available block
+     * This method uses the ClassGraph library to collect every available hoveredBlock
      * https://repo1.maven.org/maven2/io/github/classgraph/classgraph/
      */
     private void initBuildingBlocks() {
@@ -136,9 +140,8 @@ public class MenuManager {
         
         buildManager.draw(c, placeStartPoint, rotatedBlock, removeStartPoint);
         
-        drawBuildMenu(g);
-        drawCategoryMenu(g);
         drawHoveredBlock(g);
+        drawBuildMenu(g);
         
         if(detailsMenu != null) {
             detailsMenu.draw(g);
@@ -146,18 +149,19 @@ public class MenuManager {
     }
     
     private void drawHoveredBlock(Graphics g) {
-        Block block = world.getBlock(c.getMouseToWorldGridPosX(), c.getMouseToWorldGridPosY());
-        if(block == null) {
-            block = world.getNode(c.getMouseToWorldGridPosX(), c.getMouseToWorldGridPosY());
+        hoveredBlock = world.getBlock(c.getMouseToWorldGridPosX(), c.getMouseToWorldGridPosY());
+        
+        if(hoveredBlock == null) {
+            hoveredBlock = world.getNode(c.getMouseToWorldGridPosX(), c.getMouseToWorldGridPosY());
         }
         
-        if(block != null) {
+        if(hoveredBlock != null) {
             g.setColor(Color.WHITE);
             Font oldFont = g.getFont();
             g.setFont(oldFont.deriveFont(24f));
-            g.drawString(block.getName(), (MainLogic.SCREEN_RES.x - g.getFontMetrics().stringWidth(block.getName()))/2, MainLogic.SCREEN_RES.y-3);
+            g.drawString(hoveredBlock.getName(), (MainLogic.SCREEN_RES.x - g.getFontMetrics().stringWidth(hoveredBlock.getName()))/2, MainLogic.SCREEN_RES.y-3);
             g.setFont(oldFont);
-            block.drawHovered(c);
+            hoveredBlock.drawHovered(c);
         }
     }
     
@@ -171,13 +175,17 @@ public class MenuManager {
         detailsButtonY = 0;
         
         if(selectedBlock != null) {
-            drawBlockMenu(g, selectedBlock);
+            drawBlockMenu(g, selectedBlock, false);
         } else if(c.getMouseX() >= bMenuX && c.getMouseX() < bMenuCatX && c.getMouseY() >= bMenuY) {
             int index = calulateBuildMenuIndex();
             
             if(index != -1) {
-                drawBlockMenu(g, getAlBuildingBlocks().get(index));
+                drawBlockMenu(g, getAlBuildingBlocks().get(index), false);
+            } else if(hoveredBlock != null) {
+                drawBlockMenu(g, hoveredBlock, true);
             }
+        } else if(hoveredBlock != null) {
+            drawBlockMenu(g, hoveredBlock, true);
         }
         
         g.setFont(f);
@@ -196,6 +204,8 @@ public class MenuManager {
                 y--;
             }
         }
+        
+        drawCategoryMenu(g);
     }
     
     private void drawCategoryMenu(Graphics g) {
@@ -206,13 +216,22 @@ public class MenuManager {
         }
     }
     
-    private void drawBlockMenu(Graphics g, Block b) {
-        int count = 1 + b.getHmNeededItems().size();
-        int detailsButtonTextOffset = 2;
+    private void drawBlockMenu(Graphics g, Block b, boolean hovering) {
+        int count = 1;
+        boolean drawHealth = false;
         
-        int strPosY = bMenuY-bFontSize*(count-1);
+        if(hovering) {
+            drawHealth = b.getStatsManager().getMaxHealth() > 0;
+            if(drawHealth) {
+                count++;
+            }
+        } else {
+            count += b.getHmNeededItems().size();
+        }
+        
+        int strPosY = bMenuY-bFontSize*(count-1)-bPadding;
         int lX = bMenuX + bPadding;
-        blockMenuHeight = bFontSize * count + bPadding;
+        blockMenuHeight = bFontSize * count + bPadding*2;
         detailsButtonY = strPosY-bFontSize;
         
         g.setColor(bgLightColor);
@@ -227,23 +246,37 @@ public class MenuManager {
         g.setColor(Color.BLACK);
         g.drawString("?", detailsButtonX+(detailsButtonSize-g.getFontMetrics().stringWidth("?"))/2, strPosY-detailsButtonTextOffset);
         
-        strPosY += datailsSize;
         
-        for(Map.Entry<ItemType, Integer> entry : b.getHmNeededItems().entrySet()) {
-            int curValue = world.getCore().getInventory().getOrDefault(entry.getKey(), 0);
-            String curItem = Inventory.formatName(entry.getKey()) + ": ";
+        if(!hovering) {
+            strPosY += datailsSize + bPadding;
+            
+            for(Map.Entry<ItemType, Integer> entry : b.getHmNeededItems().entrySet()) {
+                int curValue = world.getCore().getInventory().getOrDefault(entry.getKey(), 0);
+                String curItem = Inventory.formatName(entry.getKey()) + ": ";
+
+                g.setColor(Color.WHITE);
+                g.drawString(curItem, lX, strPosY);
+
+                if(curValue < entry.getValue()) {
+                    g.setColor(Color.RED);
+                } else {
+                    g.setColor(Color.WHITE);
+                }
+
+                g.drawString(curValue + "/" + entry.getValue(), lX + g.getFontMetrics().stringWidth(curItem), strPosY);
+                strPosY += bFontSize;
+            }
+        } else if(drawHealth) {
+            strPosY += bPadding;
+            g.setColor(Color.GRAY);
+            g.fillRect(lX, strPosY, bHealthBarWidth, bFontSize);
+            g.setColor(Color.RED);
+            g.fillRect(lX, strPosY, (int)(bHealthBarWidth * (b.getStatsManager().getHealth()/(double)b.getStatsManager().getMaxHealth())), bFontSize);
+            
+            strPosY += bFontSize - bPadding/2;
             
             g.setColor(Color.WHITE);
-            g.drawString(curItem, lX, strPosY);
-            
-            if(curValue < entry.getValue()) {
-                g.setColor(Color.RED);
-            } else {
-                g.setColor(Color.WHITE);
-            }
-            
-            g.drawString(curValue + "/" + entry.getValue(), lX + g.getFontMetrics().stringWidth(curItem), strPosY);
-            strPosY += bFontSize;
+            g.drawString("Health", lX+(bHealthBarWidth-g.getFontMetrics().stringWidth("Health"))/2, strPosY);
         }
     }
     
