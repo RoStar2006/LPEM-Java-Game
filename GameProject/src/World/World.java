@@ -102,7 +102,10 @@ public class World {
     
     private boolean updatePlannedBlock(PlannedBlock plannedBlock, double deltaTime) {
         boolean result = false;
-        if(plannedBlock.getState() == 0) { // construction
+        
+        if(plannedBlock.getBlock().getStatsManager().isDead()) {
+            result = true;
+        } else if(plannedBlock.getState() == 0) { // construction
             if(plannedBlock.getBlock().isDestructing()) {
                 result = true;
             } else {
