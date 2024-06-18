@@ -164,7 +164,7 @@ public class World {
                 
                 if(canPlace) {
                     if(!areaFree) { // Area not free, so refund it, to replace it
-                        refundBlock(block);
+                        refundBlock(getBlock(block.getX(), block.getY()));
                     }
                     
                     for(Map.Entry<ItemType, Integer> entry : block.getHmNeededItems().entrySet()) {
