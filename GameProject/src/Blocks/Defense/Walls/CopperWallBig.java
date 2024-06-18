@@ -6,18 +6,19 @@ package Blocks.Defense.Walls;
 
 import Blocks.Base.Block;
 import Blocks.Base.BlockType;
+import Items.ItemType;
 import java.awt.Color;
-import java.awt.Graphics;
 
 /**
  *
  * @author Romeo
  */
-public class Wall extends Block {
+public class CopperWallBig extends Block {
     
-    public Wall(int x, int y) {
+    public CopperWallBig(int x, int y) {
         super(x, y);
-        initBlock("Wall", 0.75, 400, 1, 1, Color.BLUE, Color.LIGHT_GRAY);
+        initBlock("Big Copper Wall", 2.5, 1200, 2, 2, Color.BLUE, Color.ORANGE);
         setBlockType(BlockType.Wall);
+        addNeededItem(ItemType.CopperOre, 20);
     }
 }

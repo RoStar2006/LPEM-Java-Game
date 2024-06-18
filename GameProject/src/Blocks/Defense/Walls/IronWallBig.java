@@ -8,18 +8,18 @@ import Blocks.Base.Block;
 import Blocks.Base.BlockType;
 import Items.ItemType;
 import java.awt.Color;
-import java.awt.Graphics;
 
 /**
  *
  * @author Romeo
  */
-public class BigWall extends Block {
+public class IronWallBig extends Block {
     
-    public BigWall(int x, int y) {
+    public IronWallBig(int x, int y) {
         super(x, y);
-        initBlock("Big Wall", 2.5, 1600, 2, 2, Color.BLUE, Color.DARK_GRAY);
         setBlockType(BlockType.Wall);
-        addNeededItem(ItemType.IronOre, 4);
+        initBlock("Big Iron Wall", 4, 2000, 2, 2, Color.BLUE, Color.LIGHT_GRAY);
+        addNeededItem(ItemType.IronIngot, 20);
     }
+    
 }
