@@ -18,8 +18,8 @@ public class Core extends UpdatedBlock {
         super(x, y);
         initBlock("Core", 0, 1000, 3, 3, Color.BLUE, Color.CYAN);
         createInventory(4000, -1, false);
-        forceAddItem(ItemType.CopperOre, 20);
-        forceAddItem(ItemType.IronOre, 20);
+        forceAddItem(ItemType.CopperOre, 100);
+        forceAddItem(ItemType.IronOre, 100);
     }
 
     @Override

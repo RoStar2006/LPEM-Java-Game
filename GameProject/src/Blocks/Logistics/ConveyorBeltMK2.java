@@ -5,6 +5,7 @@
 package Blocks.Logistics;
 
 import Blocks.Base.ConveyorBelt;
+import Items.ItemType;
 import java.awt.Color;
 
 /**
@@ -15,8 +16,10 @@ public class ConveyorBeltMK2 extends ConveyorBelt {
 
     public ConveyorBeltMK2(int x, int y) {
         super(x, y);
-        initBlock("Conveyor Belt MK2", 0.01, 20, 1, 1, Color.MAGENTA, new Color(0, 255, 85));
+        initBlock("Iron Conveyor", 0.01, 20, 1, 1, Color.MAGENTA, new Color(0, 255, 85));
         setTravelSpeed(180);
+        addNeededItem(ItemType.IronIngot, 2);
+        addNeededItem(ItemType.CopperIngot, 1);
     }
     
 }
