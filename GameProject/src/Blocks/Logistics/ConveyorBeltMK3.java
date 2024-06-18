@@ -16,7 +16,7 @@ public class ConveyorBeltMK3 extends ConveyorBelt {
     public ConveyorBeltMK3(int x, int y) {
         super(x, y);
         initBlock("Conveyor Belt MK3", 0.01, 20, 1, 1, Color.MAGENTA, new Color(0, 255, 170));
-        setTravelSpeed(270);
+        setTravelSpeed(450);
     }
     
 }
