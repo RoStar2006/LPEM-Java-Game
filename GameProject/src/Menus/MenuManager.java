@@ -229,9 +229,20 @@ public class MenuManager {
         
         strPosY += datailsSize;
         
-        g.setColor(Color.WHITE);
         for(Map.Entry<ItemType, Integer> entry : b.getHmNeededItems().entrySet()) {
-            g.drawString(Inventory.formatName(entry.getKey()) + " " + world.getCore().getInventory().getOrDefault(entry.getKey(), 0) + "/"+ entry.getValue(), lX, strPosY);
+            int curValue = world.getCore().getInventory().getOrDefault(entry.getKey(), 0);
+            String curItem = Inventory.formatName(entry.getKey()) + ": ";
+            
+            g.setColor(Color.WHITE);
+            g.drawString(curItem, lX, strPosY);
+            
+            if(curValue < entry.getValue()) {
+                g.setColor(Color.RED);
+            } else {
+                g.setColor(Color.WHITE);
+            }
+            
+            g.drawString(curValue + "/" + entry.getValue(), lX + g.getFontMetrics().stringWidth(curItem), strPosY);
             strPosY += bFontSize;
         }
     }
