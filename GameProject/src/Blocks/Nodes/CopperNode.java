@@ -16,8 +16,7 @@ public class CopperNode extends Node {
     
     public CopperNode(int x, int y) {
         super(x, y);
-        initNode("Copper Node", Color.ORANGE, ItemType.CopperOre);
-        setSpawnsInChunk(5);
+        initNode("Copper Node", Color.ORANGE, ItemType.CopperOre, 5);
     }
     
 }

@@ -16,8 +16,7 @@ public class TitaniumNode extends Node {
     
     public TitaniumNode(int x, int y) {
         super(x, y);
-        initNode("Titanium Node", new Color(91, 121, 142), ItemType.TitaniumOre);
-        setSpawnsInChunk(2.5);
+        initNode("Titanium Node", new Color(91, 121, 142), ItemType.TitaniumOre, 2.5);
     }
     
 }

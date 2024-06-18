@@ -17,16 +17,13 @@ public class Node extends Block {
     
     public Node(int x, int y) {
         super(x, y);
-        initNode("Node", Color.BLACK, ItemType.DefaultItem);
+        initNode("Node", Color.BLACK, ItemType.DefaultItem, 0);
     }
 
-    protected void initNode(String name, Color color, ItemType collectableResource) {
+    protected void initNode(String name, Color color, ItemType collectableResource, double spawnsInChunk) {
         super.initBlock(name, 0, 0, 1, 1, color);
-        setCollectableResource(collectableResource);
-    }
-    
-    private void setCollectableResource(ItemType itemType) {
-        this.collectableResource = itemType;
+        this.collectableResource = collectableResource;
+        this.spawnsInChunk = spawnsInChunk;
     }
 
     public ItemType getCollectableResource() {
@@ -35,10 +32,6 @@ public class Node extends Block {
 
     public double getSpawnsInChunk() {
         return spawnsInChunk;
-    }
-
-    protected void setSpawnsInChunk(double spawnsInChunk) {
-        this.spawnsInChunk = spawnsInChunk;
     }
     
 }
