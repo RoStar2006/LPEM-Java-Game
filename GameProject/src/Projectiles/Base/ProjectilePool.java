@@ -5,7 +5,6 @@
 package Projectiles.Base;
 
 import Core.StatsManager;
-import World.World;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -16,8 +15,8 @@ import java.util.HashMap;
  * @author RupRo053
  */
 public class ProjectilePool {
-    private static final HashMap<Class<? extends Projectile>, Deque<Projectile>> hmObjectPool = new HashMap<>();
-    private final static int maxSize = 1000;
+    private final static HashMap<Class<? extends Projectile>, Deque<Projectile>> hmObjectPool = new HashMap<>();
+    private final static int MAX_SIZE = 1000;
     private final static Class[] paramTypesSub = { double.class, double.class, double.class, double.class, double.class, double.class, StatsManager.class, StatsManager.class }; // The costructor template for the projectile creation
     
     public static Projectile get(Class<? extends Projectile> pClass, StatsManager source, StatsManager target, double spread, double range, double damage) {
@@ -48,7 +47,7 @@ public class ProjectilePool {
     }
     
     public static void queue(Projectile p) {
-        if(hmObjectPool.containsKey(p.getClass()) && hmObjectPool.size() < maxSize) {
+        if(hmObjectPool.containsKey(p.getClass()) && hmObjectPool.size() < MAX_SIZE) {
             hmObjectPool.get(p.getClass()).push(p);
         }
     }

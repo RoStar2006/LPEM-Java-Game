@@ -9,6 +9,7 @@ import Blocks.Logistics.Junction;
 import Core.Camera;
 import Core.MainLogic;
 import Core.Utils;
+import Items.Inventory;
 import Items.ItemType;
 import World.BuildManager;
 import World.World;
@@ -230,7 +231,7 @@ public class MenuManager {
         
         g.setColor(Color.WHITE);
         for(Map.Entry<ItemType, Integer> entry : b.getHmNeededItems().entrySet()) {
-            g.drawString(entry.getKey() + " " + world.getCore().getInventory().getOrDefault(entry.getKey(), 0) + "/"+ entry.getValue(), lX, strPosY);
+            g.drawString(Inventory.formatName(entry.getKey()) + " " + world.getCore().getInventory().getOrDefault(entry.getKey(), 0) + "/"+ entry.getValue(), lX, strPosY);
             strPosY += bFontSize;
         }
     }
