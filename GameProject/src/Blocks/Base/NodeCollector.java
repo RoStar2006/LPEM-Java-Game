@@ -37,10 +37,11 @@ public class NodeCollector extends UpdatedBlock {
             return;
         }
         
-        curCooldown += deltaTime;
         if(curCooldown >= maxCooldown) {
             curCooldown -= maxCooldown;
             forceAddItem(node.getCollectableResource(), 1);
+        } else {
+            curCooldown += deltaTime;
         }
         
         if(!getInventory().isEmpty()) {
