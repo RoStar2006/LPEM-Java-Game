@@ -24,7 +24,6 @@ public class Block {
     protected int width, height;
     private double buildTime;
     private double buildProgress;
-    private double maxBuildProgress;
     private double buildAnimPerc = 1.0;
     protected Color color1;
     protected Color color2;
@@ -40,9 +39,9 @@ public class Block {
     private final double healthBarHeight = 5.0 / WorldManager.BLOCK_SIZE;
     
     private boolean isBuilding = false;
-    private Color buildColor = new Color(64, 224, 208, 128);
+    private final static Color BUILD_COLOR = new Color(64, 224, 208, 128);
     private boolean isDestructing = false;
-    private Color destructColor = new Color(224, 64, 80, 128);
+    private final static Color DESTRUCT_COLOR = new Color(224, 64, 80, 128);
     
     private Polygon polygon = new Polygon();
     private Point polygonCenter = new Point();
@@ -93,11 +92,11 @@ public class Block {
     }
     
     public final void drawBuildingOverlay(Camera c) {
-        c.fillRect(x + width/2.0*(1 - buildAnimPerc), y + height/2.0*(1 - buildAnimPerc), width*buildAnimPerc, height*buildAnimPerc, buildColor);
+        c.fillRect(x + width/2.0*(1 - buildAnimPerc), y + height/2.0*(1 - buildAnimPerc), width*buildAnimPerc, height*buildAnimPerc, BUILD_COLOR);
     }
     
     public final void drawDestructOverlay(Camera c) {
-        c.fillRect(x + width/2.0*(1 - buildAnimPerc), y + height/2.0*(1 - buildAnimPerc), width*buildAnimPerc, height*buildAnimPerc, destructColor);
+        c.fillRect(x + width/2.0*(1 - buildAnimPerc), y + height/2.0*(1 - buildAnimPerc), width*buildAnimPerc, height*buildAnimPerc, DESTRUCT_COLOR);
         c.drawRect(x, y, width, height, Color.RED);
     }
     
@@ -159,7 +158,6 @@ public class Block {
         if(state == 0) {
             buildAnimPerc -= deltaTime / buildTime;
             buildProgress = Math.min(buildProgress+deltaTime, buildTime);
-            maxBuildProgress = buildTime/buildProgress;
             return buildProgress >= buildTime;
         } else {
             buildAnimPerc += deltaTime / buildTime;

@@ -221,6 +221,14 @@ public class BuildManager {
         Getters and setters
     */
     
+    /**
+     * This method checks if a conveyor belt can be replaced by a junction, if yes then it returns a junction, else it returns the {@link #selectedBlock}.
+     * @param x
+     * @param y
+     * @param rotatedBlock
+     * @param multiPlace
+     * @return 
+     */
     private Block getFilteredBlock(int x, int y, boolean rotatedBlock, boolean multiPlace) {
         if(multiPlace && !rotatedBlock && junction != null) {
             Block wBlock = world.getBlock(x, y);
