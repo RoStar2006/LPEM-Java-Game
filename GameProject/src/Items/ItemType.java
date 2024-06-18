@@ -11,7 +11,8 @@ package Items;
 public enum ItemType {
     DefaultItem,
     IronOre,
-    CopperOre,
     IronIngot,
+    CopperOre,
     CopperIngot,
+    TitaniumOre,
 }

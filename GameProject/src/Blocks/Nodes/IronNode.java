@@ -16,7 +16,8 @@ public class IronNode extends Node {
     
     public IronNode(int x, int y) {
         super(x, y);
-        initNode("Iron node", Color.GRAY, ItemType.IronOre);
+        initNode("Iron Node", Color.DARK_GRAY, ItemType.IronOre);
+        setSpawnsInChunk(4);
     }
     
 }
