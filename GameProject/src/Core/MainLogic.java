@@ -67,16 +67,28 @@ public class MainLogic {
      * This manages the game's physics and other core methods like update(), ...
      */
     public void update() {
-        deltaTime = (System.nanoTime() - lastTime) / Math.pow(10, 9) * MainLogic.GAME_SPEED;
+        deltaTime = (System.nanoTime() - lastTime) / Math.pow(10, 9);
         lastTime = System.nanoTime();
         
-        curConveyorAnim += deltaTime;
+        double speed = GAME_SPEED;
         
-        worldManager.update(deltaTime);
+        while(speed >= 1) {    
+            updateGame(deltaTime);
+            speed--;
+        }
+        
+        if(speed < 1 && speed > 0) {
+            updateGame(deltaTime*speed);
+        }
         
         if(menuManager.canInteract()) {
             camera.move();
         }
+    }
+    
+    private void updateGame(double deltaTime) {
+        curConveyorAnim += deltaTime;
+        worldManager.update(deltaTime);
     }
 
     public static double getCurConveyorAnim() {
