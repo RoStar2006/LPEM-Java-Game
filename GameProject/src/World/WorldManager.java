@@ -4,13 +4,10 @@
  */
 package World;
 
-import Blocks.Nodes.CopperNode;
 import Blocks.Base.Core;
-import Blocks.Nodes.IronNode;
 import Blocks.Base.Node;
 import Core.Camera;
 import Core.MainLogic;
-import Core.StatsManager;
 import Enemies.Base.EnemyManager;
 import Enemies.Base.SpawnRegion;
 import Menus.MenuManager;

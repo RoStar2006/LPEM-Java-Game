@@ -246,8 +246,8 @@ public class EnemyManager {
     public boolean isEnemyOnPos(int x, int y) {
         for(int i = alEnemies.size()-1; i >= 0; i--) {
             Enemy enemy = alEnemies.get(i);
-            if(enemy.getX() >= x - WorldManager.ENEMY_BUILD_DIST && enemy.getX() + enemy.getSize() <= x+1 + WorldManager.ENEMY_BUILD_DIST && 
-                enemy.getY() >= y - WorldManager.ENEMY_BUILD_DIST && enemy.getY() + enemy.getSize() <= y+1 + WorldManager.ENEMY_BUILD_DIST ) {
+            if(Math.round(enemy.getX()) + enemy.getRadius() >= x - WorldManager.ENEMY_BUILD_DIST && Math.round(enemy.getX()) - enemy.getRadius() <= x + WorldManager.ENEMY_BUILD_DIST && 
+                Math.round(enemy.getY()) + enemy.getRadius() >= y - WorldManager.ENEMY_BUILD_DIST && Math.round(enemy.getY()) - enemy.getRadius() <= y + WorldManager.ENEMY_BUILD_DIST ) {
                 return true;
             }
         }

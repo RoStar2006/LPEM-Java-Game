@@ -179,7 +179,7 @@ public class StatsManager {
         if(isBlock()) {
             return block.getCenterX();
         } else if(isEnemy()) {
-            return enemy.getCenterX();
+            return enemy.getX();
         }
         
         return 0; // should never return 0, because the stats manager is only applied to blocks and enemies
@@ -189,7 +189,7 @@ public class StatsManager {
         if(isBlock()) {
             return block.getCenterY();
         } else if(isEnemy()) {
-            return enemy.getCenterY();
+            return enemy.getY();
         }
         
         return 0; // should never return 0, because the stats manager is only applied to blocks and enemies

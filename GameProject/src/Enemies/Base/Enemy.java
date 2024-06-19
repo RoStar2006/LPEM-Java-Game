@@ -9,7 +9,9 @@ import Core.Camera;
 import Blocks.Base.Core;
 import Core.StatsManager;
 import World.World;
+import World.WorldManager;
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 /**
  *
@@ -23,11 +25,13 @@ public class Enemy {
     private int speed;
     private Core core;
     private double size;
-    private int range;
+    private double range;
     private StatsManager statsManager;
     private Color color;
     
-    private double xDir, yDir;
+    private Point2D.Double blockPoint = new Point2D.Double();
+    
+    private double angle, xDir, yDir;
     
     /**
      * Chance from 0 to 100% for this enemy to spawn.
@@ -58,7 +62,7 @@ public class Enemy {
         }
     }
     
-    protected final void initEnemy(double maxHealth, double damage, double attackSpeed, int range, int speed, double size, Color color) {
+    protected final void initEnemy(double maxHealth, double damage, double attackSpeed, double range, int speed, double size, Color color) {
         statsManager.init(maxHealth, damage, attackSpeed);
         this.speed = speed;
         this.range = range;
@@ -98,19 +102,32 @@ public class Enemy {
     }
     
     private void calcDir(Block block) {
-        double angle = Math.atan2(block.getCenterY() - y, block.getCenterX() - x);
+        angle = Math.atan2(block.getCenterY() - y, block.getCenterX() - x);
         xDir = Math.cos(angle);
         yDir = Math.sin(angle);
     }
     
     private Block getBlockInFront(World world) {
-        double lX = x + xDir;
-        double lY = y + yDir;
-        
-        for(int i = 0; i < range; i++) {
-            Block block = world.getBlock((int)Math.round(lX + i * Math.signum(xDir)), (int)Math.round(lY + i * Math.signum(yDir)));
-            if(block != null) {
-                return block;
+        for(int i = -(int)Math.ceil(size); i < Math.ceil(range); i++) { // blocks in front
+            int lX = (int)Math.round(x + (i + 1) * xDir);
+            int lY = (int)Math.round(y + (i + 1) * yDir);
+            Block b = world.getBlock(lX, lY);
+            
+            for(int j = 1; j <= Math.ceil(size); j++) {
+                if(b == null) {
+                    b = world.getBlock(lX, lY + (int)Math.signum(yDir)*j);
+                } 
+                if(b == null) {
+                    b = world.getBlock(lX + (int)Math.signum(xDir)*j, lY);
+                }
+                
+                if(b != null) {
+                    break;
+                }
+            }
+            
+            if(b != null && calcDist(b) <= getAttackRange()) {
+                return b;
             }
         }
         
@@ -120,18 +137,18 @@ public class Enemy {
     private Block getBlockInRange(World world) {
         Block result = null;
         double smallestDist = -1;
-        int x1 = (int)Math.floor(x + size - range);
-        int x2 = (int)Math.ceil(x + size + range);
-        int y1 = (int)Math.floor(y + size - range);
-        int y2 = (int)Math.ceil(x + size + range);
+        int x1 = (int)Math.floor(x - getAttackRange());
+        int x2 = (int)Math.ceil(x + getAttackRange());
+        int y1 = (int)Math.floor(y - getAttackRange());
+        int y2 = (int)Math.ceil(y + getAttackRange());
         
-        for(int x = x1; x < x2; x++) {
-            for(int y = y1; y < y2; y++) {
-                Block block = world.getBlock(x, y);
+        for(int lX = x1; lX < x2; lX++) {
+            for(int lY = y1; lY < y2; lY++) {
+                Block block = world.getBlock(lX, lY);
                 
                 if(block != null) {
                     double d = calcDist(block);
-                    if(smallestDist == -1 || d < smallestDist) {
+                    if(d <= getAttackRange() && (smallestDist == -1 || d < smallestDist)) {
                         smallestDist = d;
                         result = block;
                     }
@@ -143,34 +160,79 @@ public class Enemy {
     }
     
     private double calcDist(Block block) {
-        double vX = block.getX() + block.getWidth()/2.0 - x + size;
-        double vY = block.getY() + block.getHeight()/2.0 - y + size;
+        Point2D.Double pointOnRect = calcPointOnRect(block);
+        
+        double vX = x - pointOnRect.x;
+        double vY = y - pointOnRect.y;
         
         return Math.sqrt(vX*vX + vY*vY);
     }
     
-    public int getX() {
-        return (int)Math.round(x);
+    /**
+     * This method calculates the point on a rectangle (block), where the enemy line of sight intersects first. <br>
+     * Source: https://stackoverflow.com/questions/4061576/finding-points-on-a-rectangle-at-a-given-angle
+     * @param block
+     * @return 
+     */
+    private Point2D.Double calcPointOnRect(Block block) {
+        double theta = Math.PI - angle;
+        double rectAtan = Math.atan2(block.getHeight(), block.getWidth());
+        double tanTheta = Math.tan(theta);
+        int region;
+
+        if ((theta > -rectAtan) && (theta <= rectAtan)) {
+            region = 1;
+        } else if ((theta > rectAtan) && (theta <= (Math.PI - rectAtan))) {
+            region = 2;
+        } else if ((theta > (Math.PI - rectAtan)) || (theta <= -(Math.PI - rectAtan))) {
+            region = 3;
+        } else {
+            region = 4;
+        }
+        
+        int xFactor = 1;
+        int yFactor = 1;
+
+        switch (region) {
+          case 1 -> yFactor = -1;
+          case 2 -> yFactor = -1;
+          case 3 -> xFactor = -1;
+          case 4 -> xFactor = -1;
+        }
+
+        if((region == 1) || (region == 3)) {
+            blockPoint.x = block.getCenterX() + xFactor * (block.getWidth() / 2.0);
+            blockPoint.y = block.getCenterY() + yFactor * (block.getWidth() / 2.0) * tanTheta;
+        } else {
+            blockPoint.x = block.getCenterX() + xFactor * (block.getHeight() / (2.0 * tanTheta));
+            blockPoint.y = block.getCenterY() + yFactor * (block.getHeight() /  2.0);
+        }
+
+        return blockPoint;
     }
     
-    public double getCenterX() {
-        return x + size;
+    private double getOffsetX() {
+        return x - size/2;
     }
     
-    public int getY() {
-        return (int)Math.round(y);
+    private double getOffsetY() {
+        return y - size/2;
     }
-    
-    public double getCenterY() {
-        return y + size;
+
+    public double getX() {
+        return x;
     }
-    
-    public int getSize() {
-        return (int)Math.ceil(size);
+
+    public double getY() {
+        return y;
     }
     
     public double getRadius() {
-        return size/2.0;
+        return size / 2;
+    }
+    
+    private double getAttackRange() {
+        return range + getRadius();
     }
 
     public StatsManager getStatsManager() {
@@ -195,14 +257,20 @@ public class Enemy {
     
     public void draw(Camera c) {
         // Enemy debug
-        // c.drawRect((int)Math.floor(x + size - range), (int)Math.floor(y + size - range), (int)Math.ceil(x + size + range)-(int)Math.floor(x + size - range), (int)Math.ceil(y + size + range)-(int)Math.floor(y + size - range), Color.CYAN); // range block perfect
-        // c.drawRect(x + size - range, y + size - range, range*2, range*2, Color.CYAN); // range
-//        for(int i = 0; i < range; i++) { // blocks in front
-//            c.drawRect((int)Math.round(x + xDir + i * Math.signum(xDir)), (int)Math.round(y + yDir + i * Math.signum(yDir)), 1, 1, Color.yellow);
-//        }
+        // c.drawCircle(getOffsetX() - range, getOffsetY() - range, range*2+size, Color.CYAN); // range
+        /*for(int i = -(int)Math.ceil(size); i < Math.ceil(range); i++) { // blocks in front
+            int lX = (int)Math.round(x + (i + 1) * xDir);
+            int lY = (int)Math.round(y + (i + 1) * yDir);
+            
+            c.drawRect(lX, lY, 1, 1, Color.yellow);
+            for(int j = 1; j <= Math.ceil(size); j++) {
+                c.drawRect(lX, lY + (int)Math.signum(yDir) * j, 1, 1, Color.red);
+                c.drawRect(lX + (int)Math.signum(xDir) * j, lY, 1, 1, Color.green);
+            }
+        }*/
         // c.drawRect(Math.round(x) - WorldManager.ENEMY_BUILD_DIST, Math.round(y) - WorldManager.ENEMY_BUILD_DIST, WorldManager.ENEMY_BUILD_DIST*2+1, WorldManager.ENEMY_BUILD_DIST*2+1, Color.yellow); // Forbidden build area
-        // c.drawRect(x + size/2, y + size/2, size, size, Color.GREEN); // Draw a square around the enemy
-        c.fillCircle(x + size/2, y + size/2, size, color);
+        // c.drawRect(getOffsetX(), getOffsetY(), size, size, Color.GREEN); // Draw a square around the enemy
+        c.fillCircle(getOffsetX(), getOffsetY(), size, color);
     }
     
 }

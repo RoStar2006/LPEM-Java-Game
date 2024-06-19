@@ -145,7 +145,7 @@ public class Projectile {
     private boolean checkEnemyCollision(World world) {
         for(Enemy enemy : world.getEnemyManager().getAlEnemies()) {
             if(!enemy.getStatsManager().isDead()) {
-                point2D.setLocation(enemy.getCenterX(), enemy.getCenterY());
+                point2D.setLocation(enemy.getX(), enemy.getY());
 
                 if(line2D.ptSegDist(point2D) <= enemy.getRadius()) {
                     source.forceDamage(enemy.getStatsManager(), damage, world);
