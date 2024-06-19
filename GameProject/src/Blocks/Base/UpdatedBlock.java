@@ -56,6 +56,10 @@ public abstract class UpdatedBlock extends Block {
         }
     }
     
+    protected void drawRawIcon(Graphics g, int x, int y, int width, int height) {
+        super.drawIcon(g, x, y, width, height);
+    }
+    
     /**
      * This method returns an {@link UpdatedBlock} if items can be put into it. If not, then it returns null
      * @param world

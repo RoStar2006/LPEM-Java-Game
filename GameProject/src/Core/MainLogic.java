@@ -7,7 +7,6 @@ import World.WorldManager;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
-import World.*;
 import java.util.ArrayList;
 
 /*
@@ -44,6 +43,7 @@ public class MainLogic {
     private final Color borderColor = new Color(60, 45, 67, 255/borderSpacing);
     private ArrayList<Block> alBorder = new ArrayList<>();
     
+    private static double curConveyorAnim = 0;
 
     /**
      * @param screenRes This is needed to center the camera to the middle of the screen
@@ -70,11 +70,17 @@ public class MainLogic {
         deltaTime = (System.nanoTime() - lastTime) / Math.pow(10, 9) * MainLogic.GAME_SPEED;
         lastTime = System.nanoTime();
         
+        curConveyorAnim += deltaTime;
+        
         worldManager.update(deltaTime);
         
         if(menuManager.canInteract()) {
             camera.move();
         }
+    }
+
+    public static double getCurConveyorAnim() {
+        return curConveyorAnim;
     }
     
     /**

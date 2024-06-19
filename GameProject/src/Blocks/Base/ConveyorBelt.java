@@ -5,6 +5,7 @@
 package Blocks.Base;
 
 import Core.Camera;
+import Core.MainLogic;
 import Items.ItemDrawer;
 import Items.ItemType;
 import World.World;
@@ -19,6 +20,10 @@ import java.util.ArrayList;
  */
 public class ConveyorBelt extends UpdatedBlock {
     private final int maxItems = 4;
+    private final Color conveyorStripesColor = Color.BLACK;
+    private final double conveyorStripesThickness = 0.05;
+    private final Color conveyorBorderColor = Color.DARK_GRAY;
+    private final double conveyorBorderThickness = conveyorStripesThickness*2;
     private ArrayList<ItemType> alItemOrder = new ArrayList<>();
     private ArrayList<Double> alItemTime = new ArrayList<>();
     private ArrayList<Point> alItemDirection = new ArrayList<>();
@@ -67,11 +72,13 @@ public class ConveyorBelt extends UpdatedBlock {
 
     @Override
     protected void drawIcon(Graphics g, int x, int y, int width, int height) {
-        super.drawIcon(g, x, y, width, height);
+        super.drawRawIcon(g, x, y, width, height);
     }
 
     @Override
     public void delayedDraw(Camera c, World world) {
+        drawConveyorLines(c, world);
+        
         double size = 0.25;
         double cX = x+width/2.0;
         double cY = y+height/2.0;
@@ -92,6 +99,31 @@ public class ConveyorBelt extends UpdatedBlock {
             } else {
                 i = alItemTime.size()-1;
             }
+        }
+    }
+    
+    private void drawConveyorLines(Camera c, World world) {
+        double curAnimTime = (MainLogic.getCurConveyorAnim() % traverseTime/2)/(traverseTime/2);
+        if(getDirection().y < 0 || getDirection().x < 0) {
+            curAnimTime = 1 - curAnimTime;
+        }
+        double yOffset = Math.abs(getDirection().y*curAnimTime);
+        double xOffset = Math.abs(getDirection().x*curAnimTime);
+
+        c.setColor(conveyorStripesColor);
+        if(yOffset != 0) {
+            c.fillRect(x, y+yOffset, 1, conveyorStripesThickness);
+            c.fillRect(x, y+((yOffset + 0.5) % 1), 1, conveyorStripesThickness);
+            c.setColor(conveyorBorderColor);
+            c.fillRect(x, y, conveyorBorderThickness, 1);
+            c.fillRect(x+1-conveyorBorderThickness, y, conveyorBorderThickness, 1);
+        }
+        if(xOffset != 0) {
+            c.fillRect(x+xOffset, y, conveyorStripesThickness, 1);
+            c.fillRect(x+((xOffset + 0.5) % 1), y, conveyorStripesThickness, 1);
+            c.setColor(conveyorBorderColor);
+            c.fillRect(x, y, 1, conveyorBorderThickness);
+            c.fillRect(x, y+1-conveyorBorderThickness, 1, conveyorBorderThickness);
         }
     }
 

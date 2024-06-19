@@ -174,6 +174,7 @@ public class Block {
      * @param height
      * @param faceOutwards
      * @param angle
+     * The angle needed is in radians
      * @return 
      */
     protected final Polygon getTriangle(int x, int y, int width, int height, boolean faceOutwards, double angle) {
@@ -195,7 +196,8 @@ public class Block {
     }
     
     /**
-     * Rotates any given polygon <br>Code from: http://www.java2s.com/example/java-utility-method/polygon-rotate/rotatepolygon-polygon-pg-double-rotangle-point-centroid-polygon-original-ee480.html
+     * Rotates any given polygon <br>
+     * Code from: http://www.java2s.com/example/java-utility-method/polygon-rotate/rotatepolygon-polygon-pg-double-rotangle-point-centroid-polygon-original-ee480.html
      * @param pg
      * @param rotAngle
      * The angle needed is in radians
