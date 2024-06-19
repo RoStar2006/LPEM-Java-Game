@@ -82,10 +82,10 @@ public class ConveyorBelt extends UpdatedBlock {
                 double time = alItemTime.get(i);
                 
                 if(!Double.isNaN(time) && itemType != null) {
-                    if(time >= traverseTime/2 && i < alItemDirection.size()) {
-                        ItemDrawer.drawItem(c, itemType, cX+alItemDirection.get(i).x*time, cY+alItemDirection.get(i).y*time, size);
+                    double offsetTime = 0.5 - time/traverseTime;
+                    if(offsetTime <= 0 && i < alItemDirection.size()) {
+                        ItemDrawer.drawItem(c, itemType, cX+alItemDirection.get(i).x*offsetTime, cY+alItemDirection.get(i).y*offsetTime, size);
                     } else {
-                        double offsetTime = (traverseTime/2 - alItemTime.get(i))/traverseTime;
                         ItemDrawer.drawItem(c, itemType, cX+getDirection().x*offsetTime, cY+getDirection().y*offsetTime, size);
                     }
                 }
@@ -103,7 +103,7 @@ public class ConveyorBelt extends UpdatedBlock {
         curCooldown += maxCooldown;
         alItemOrder.add(itemType);
         alItemTime.add(traverseTime);
-        alItemDirection.add(new Point(block.getX()-getX(), block.getY()-getY()));
+        alItemDirection.add(new Point(getX()-block.getX(), getY()-block.getY()));
         
         return quantity-1 + super.addItem(itemType, 1, block);
     }
