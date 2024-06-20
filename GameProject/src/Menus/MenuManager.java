@@ -63,6 +63,7 @@ public class MenuManager {
     
     private final Color bgLightColor = new Color(255, 255, 255, 64);
     private final Color bgDarkColor = new Color(0, 0, 0, 96);
+    private final Color bgSelectedColor = new Color(0, 0, 0, 96);
     private HashMap<BlockType, ArrayList<Block>> hmBuildingBlocks = new HashMap<>();
     private ArrayList<Node> alNodes = new ArrayList<>();
     private Block selectedBlock;
@@ -205,6 +206,11 @@ public class MenuManager {
         for(Block block : getAlBuildingBlocks()) {
             if(y <= 0) {
                 block.drawIcon(g, bMenuX + bPaddedIconSize * x + bPadding, bMenuY - bPaddedIconSize * y + bPadding, bIconSize);
+                
+                if(block.equals(selectedBlock)) {
+                    g.setColor(bgSelectedColor);
+                    g.fillRect(bMenuX + bPaddedIconSize * x, bMenuY - bPaddedIconSize * y, bPaddedIconSize+bPadding, bPaddedIconSize+bPadding);
+                }
             }
             
             x++;
@@ -220,8 +226,11 @@ public class MenuManager {
     private void drawCategoryMenu(Graphics g) {
         for(int i = 1; i < BlockType.values().length; i++) {
             BlockType blockType = BlockType.values()[i];
-            
             BlockTypeDrawer.drawBlockType(g, blockType, bMenuCatX, bMenuY+bPadding+bPaddedIconSize*(i-1), bIconSize);
+            if(blockType.equals(curBlockType)) {
+                g.setColor(bgSelectedColor);
+                g.fillRect(bMenuCatX-bPadding, bMenuY+bPaddedIconSize*(i-1), bPaddedIconSize+bPadding, bPaddedIconSize+bPadding);
+            }
         }
     }
     
