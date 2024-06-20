@@ -5,6 +5,7 @@
 package Menus;
 
 import Blocks.Base.*;
+import Blocks.Logistics.Storage;
 import Core.MainLogic;
 import Items.Inventory;
 import Items.ItemDrawer;
@@ -61,7 +62,7 @@ public class DetailsMenu {
             if(updatedBlock.hasInventory()) {
                 alDetailsString.add("<title>Items");
                 alDetailsString.add("Item Capacity:" + updatedBlock.getMaxStackSize() + " items");
-                if(block.getBlockType() == BlockType.ItemLogistic) {
+                if(block.getBlockType() == BlockType.ItemLogistic && !(block instanceof Storage)) {
                     String speedStr = "Speed:";
                     if(updatedBlock instanceof ConveyorBelt conveyorBelt) {
                         speedStr = addNumber(speedStr, conveyorBelt.getSpeed()) + " items/second";
