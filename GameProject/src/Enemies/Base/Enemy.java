@@ -8,8 +8,9 @@ import Blocks.Base.Block;
 import Core.Camera;
 import Blocks.Base.Core;
 import Core.StatsManager;
+import Projectiles.Base.Projectile;
+import Projectiles.Base.ProjectilePool;
 import World.World;
-import World.WorldManager;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
@@ -23,7 +24,6 @@ public class Enemy {
      * blocks per second
      */
     private int speed;
-    private Core core;
     private double size;
     private double range;
     private StatsManager statsManager;
@@ -32,6 +32,7 @@ public class Enemy {
     private Point2D.Double blockPoint = new Point2D.Double();
     
     private double angle, xDir, yDir;
+    private Class<? extends Projectile> pClass;
     
     /**
      * Chance from 0 to 100% for this enemy to spawn.
@@ -55,7 +56,6 @@ public class Enemy {
     public final void init(double x, double y, Core core) {
         this.x = x;
         this.y = y;
-        this.core = core;
         
         if(core != null) {
             calcDir(core);
@@ -68,6 +68,10 @@ public class Enemy {
         this.range = range;
         this.size = size;
         this.color = color;
+    }
+    
+    protected void setProjectile(Class<? extends Projectile> pClass) {
+        this.pClass = pClass;
     }
     
     /**
@@ -84,6 +88,8 @@ public class Enemy {
     }
     
     public void move(double deltaTime, World w) {
+        statsManager.update(deltaTime);
+        
         Block fB = getBlockInFront(w);
         Block rB = getBlockInRange(w);
         
@@ -92,12 +98,30 @@ public class Enemy {
             y += yDir * speed * deltaTime;
         } 
         
-        if(fB != null) {
-            statsManager.update(deltaTime);
-            statsManager.doDamage(fB.getStatsManager(), w);
-        } else if(rB != null) {
-            statsManager.update(deltaTime);
-            statsManager.doDamage(rB.getStatsManager(), w);
+        Block block = fB;
+        
+        if(block == null) {
+            block = rB;
+        }
+        
+        if(block != null) {
+            if(pClass == null) { // melee
+                statsManager.doDamage(block.getStatsManager(), w);
+            } else { // range
+                while(statsManager.isOffCooldown()) {
+                    statsManager.shoot();
+                    
+                    shoot(w, block, 0);
+                }
+            }
+        }
+    }
+    
+    protected void shoot(World world, Block block, double spread) {
+        Projectile p = ProjectilePool.get(pClass,  statsManager, block.getStatsManager(), spread, range, statsManager.getDamage());
+        
+        if(p != null) {
+            world.getProjectileManager().add(p);
         }
     }
     
@@ -113,7 +137,7 @@ public class Enemy {
             int lY = (int)Math.round(y + (i + 1) * yDir);
             Block b = world.getBlock(lX, lY);
             
-            for(int j = 1; j <= Math.ceil(size); j++) {
+            for(int j = 1; j <= Math.ceil(size); j++) { // spread out to the sides
                 if(b == null) {
                     b = world.getBlock(lX, lY + (int)Math.signum(yDir)*j);
                 } 

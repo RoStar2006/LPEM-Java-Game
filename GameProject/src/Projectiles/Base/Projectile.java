@@ -4,6 +4,7 @@
  */
 package Projectiles.Base;
 
+import Blocks.Base.Block;
 import Core.Camera;
 import Core.MainLogic;
 import Core.StatsManager;
@@ -71,6 +72,7 @@ public class Projectile {
         this.hit = false;
         this.curDecay = 0;
         this.damage = damage;
+        this.extendedToTarget = false;
         
         point2D = new Point2D.Double(target.getCenterX(), target.getCenterY());
         line2D = new Line2D.Double(startX, startY, startX, startY);
@@ -97,7 +99,7 @@ public class Projectile {
     }
     
     protected boolean move(double deltaTime) {
-        if(speed > 0) {
+        if(!isTrail()) {
             lastStepX = xDir * speed * deltaTime;
             lastStepY = yDir * speed * deltaTime;
             x = Utils.clampDouble(x+lastStepX, startX, endX);
@@ -136,7 +138,7 @@ public class Projectile {
         if(target.isEnemy()) {
             result = checkEnemyCollision(world);
         } else if(target.isBlock()) {
-            System.err.println("Projectile block collision is not implemented!");
+            result = checkBlockCollision(world);
         }
         
         return (x == endX && y == endY) || result;
@@ -160,8 +162,50 @@ public class Projectile {
         return hit;
     }
     
+    private boolean checkBlockCollision(World world) {
+        if(!isTrail()) {
+            for(int lY = -1; lY <= 1; lY++) {
+                for(int lX = -1; lX <= 1; lX++) {
+                    Block block = world.getBlock((int)x + lY, (int)y + lY);
+                    
+                    if(block != null && circleRectIntersection(block)) {
+                        hit = true;
+                        source.forceDamage(block.getStatsManager(), damage, world);
+                        return true;
+                    }
+                }
+            }
+        } else {
+            if(target != null) { // Trails are using hit scan, so it hits no mater what.
+                hit = true;
+                source.forceDamage(target, damage, world);
+            }
+        }
+        
+        return hit;
+    }
+    
+    private boolean circleRectIntersection(Block block) {
+        // Find the closest point to the circle within the rectangle
+        double closestX = Utils.clampDouble(x, block.getX(), block.getX()+block.getWidth());
+        double closestY = Utils.clampDouble(y, block.getY(), block.getY()+block.getHeight());
+
+        // Calculate the distance between the circle's center and this closest point
+        double distanceX = x - closestX;
+        double distanceY = y - closestY;
+
+        // If the distance is less than the circle's radius, an intersection occurs
+        double distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+        
+        return distanceSquared < (width * width)/2;
+    }
+    
     private boolean isDecayed() {
-        return speed <= 0 && curDecay <= speed;
+        return isTrail() && curDecay <= speed;
+    }
+    
+    private boolean isTrail() {
+        return speed <= 0;
     }
     
     protected double getTrailWidth() {
