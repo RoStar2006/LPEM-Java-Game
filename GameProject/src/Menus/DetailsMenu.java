@@ -30,10 +30,12 @@ public class DetailsMenu {
     private final int closeButtonX = (MainLogic.SCREEN_RES.x - closeButtonWidth)/2;
     private final int closeButtonY = MainLogic.SCREEN_RES.y - closeButtonHeight*2;
     private final ArrayList<String> alDetailsString = new ArrayList<>();
+    private final ArrayList<Node> alNodes;
     
-    public DetailsMenu(Block block, Color bgColor) {
+    public DetailsMenu(Block block, ArrayList<Node> alNodes, Color bgColor) {
         this.bgColor = bgColor;
         this.block = block;
+        this.alNodes = alNodes;
         initDetailsList(block);
     }
     
@@ -104,6 +106,12 @@ public class DetailsMenu {
             } else if(updatedBlock instanceof NodeCollector nodeCollector) {
                 alDetailsString.add("<title>Input/Output");
                 alDetailsString.add(addNumber("Mining Speed:", nodeCollector.getMiningSpeed()) + " items/second");
+                alDetailsString.add("Minable nodes:");
+                for(Node node : alNodes) {
+                    if(block.isPlacableOn(node)) {
+                        alDetailsString.add("<tab>" + node.getName());
+                    }
+                }
             }
         } 
     }

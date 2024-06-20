@@ -64,6 +64,7 @@ public class MenuManager {
     private final Color bgLightColor = new Color(255, 255, 255, 64);
     private final Color bgDarkColor = new Color(0, 0, 0, 96);
     private HashMap<BlockType, ArrayList<Block>> hmBuildingBlocks = new HashMap<>();
+    private ArrayList<Node> alNodes = new ArrayList<>();
     private Block selectedBlock;
     private Block hoveredBlock;
     private BlockType curBlockType;
@@ -113,12 +114,20 @@ public class MenuManager {
             List<Class<Block>> alBlockClasses = scanResult.getSubclasses(Block.class.getName()).loadClasses(Block.class);
             
             for(Class<Block> bC : alBlockClasses) {
-                if(!bC.getPackage().getName().contains("Base") && !bC.getPackage().getName().contains("Nodes")) {
+                if(!bC.getPackage().getName().contains("Base")) {
                     Block block = BuildManager.createBlock(bC);
                     
-                    if(block != null && block.getBlockType() != BlockType.None) {
-                        createdBlock = true;
-                        hmBuildingBlocks.get(block.getBlockType()).add(block);
+                    if(block == null) {
+                        continue;
+                    }
+                    
+                    if(!(block instanceof Node node)) {
+                        if(block.getBlockType() != BlockType.None) {
+                            createdBlock = true;
+                            hmBuildingBlocks.get(block.getBlockType()).add(block);
+                        }
+                    } else {
+                        alNodes.add(node);
                     }
                 }
             }
@@ -156,11 +165,11 @@ public class MenuManager {
         }
         
         if(hoveredBlock != null) {
-            g.setColor(Color.WHITE);
-            Font oldFont = g.getFont();
-            g.setFont(oldFont.deriveFont(24f));
-            g.drawString(hoveredBlock.getName(), (MainLogic.SCREEN_RES.x - g.getFontMetrics().stringWidth(hoveredBlock.getName()))/2, MainLogic.SCREEN_RES.y-3);
-            g.setFont(oldFont);
+//            g.setColor(Color.WHITE);
+//            Font oldFont = g.getFont();
+//            g.setFont(oldFont.deriveFont(24f));
+//            g.drawString(hoveredBlock.getName(), (MainLogic.SCREEN_RES.x - g.getFontMetrics().stringWidth(hoveredBlock.getName()))/2, MainLogic.SCREEN_RES.y-3);
+//            g.setFont(oldFont);
             hoveredBlock.drawHovered(c);
         }
     }
@@ -351,7 +360,7 @@ public class MenuManager {
             if(released && leftClick) {
                 if(y < bMenuY) { // Check if mouse is hovering over the selected block menu
                     if(selectedBlock != null && clickedOnInfo(x, y)) {
-                        detailsMenu = new DetailsMenu(selectedBlock, bgDarkColor);
+                        detailsMenu = new DetailsMenu(selectedBlock, alNodes, bgDarkColor);
                     }
                     return;
                 } else if(x >= bMenuCatX) { // Hovering over categories
