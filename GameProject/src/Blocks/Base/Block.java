@@ -30,6 +30,7 @@ public class Block {
     protected StatsManager statsManager;
     private String name = "Block";
     private BlockType blockType = BlockType.None;
+    private boolean replacable = true;
     private ArrayList<Class<? extends Node>> alAllowedNodes = new ArrayList<>();
     private HashMap<ItemType, Integer> hmNeededItems = new HashMap<>();
     
@@ -303,6 +304,14 @@ public class Block {
     
     public boolean isActive() {
         return !deleted && !isDestructing && !isBuilding;
+    }
+
+    public void setReplacable(boolean replacable) {
+        this.replacable = replacable;
+    }
+
+    public boolean isReplacable() {
+        return replacable;
     }
     
     public int getX() {

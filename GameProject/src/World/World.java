@@ -285,7 +285,7 @@ public class World {
         }
         
         Block lB = getBlock(block.getX(), block.getY());
-        if(lB == null || lB.getBlockType() != block.getBlockType()) { // Block type not matching
+        if(lB == null || !lB.isReplacable() || lB.getBlockType() != block.getBlockType()) { // Block type not matching
             return false;
         }
         
