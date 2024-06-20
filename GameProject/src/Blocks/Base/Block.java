@@ -148,6 +148,10 @@ public class Block {
         alAllowedNodes.add(pClass);
     }
     
+    protected void resetAllowedNodes() {
+        alAllowedNodes.clear();
+    }
+    
     protected void addNeededItem(ItemType itemType, int quantity) {
         if(quantity > 0) {
             hmNeededItems.put(itemType, quantity);

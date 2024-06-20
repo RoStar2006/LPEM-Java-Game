@@ -5,6 +5,8 @@
 package Blocks.Production.Miners;
 
 import Blocks.Base.NodeCollector;
+import Blocks.Nodes.CopperNode;
+import Blocks.Nodes.IronNode;
 import Items.ItemType;
 import java.awt.Color;
 
@@ -19,6 +21,9 @@ public class MinerMK1 extends NodeCollector {
         initBlock("Miner MK1", 1, 150, 1, 1, Color.RED, new Color(255, 255, 255));
         setMiningSpeed(60);
         addNeededItem(ItemType.CopperOre, 30);
+        resetAllowedNodes();
+        addAllowedNode(IronNode.class);
+        addAllowedNode(CopperNode.class);
     }
     
 }
