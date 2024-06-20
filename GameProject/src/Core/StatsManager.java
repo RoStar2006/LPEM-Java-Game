@@ -55,14 +55,14 @@ public class StatsManager {
     }
     
     public void doDamage(StatsManager otherStatsManager, World world) {
-        while(offCooldown()) {
+        while(isOffCooldown()) {
             curAttackCooldown += attackSpeed;
             otherStatsManager.takeDamage(damage, world);
         }
     }
     
     public boolean shoot() {
-        if(offCooldown()) {
+        if(isOffCooldown()) {
             curAttackCooldown += attackSpeed;
             return true;
         } else {
@@ -131,7 +131,7 @@ public class StatsManager {
         this.enemy = enemy;
     }
     
-    public boolean offCooldown() {
+    public boolean isOffCooldown() {
         return curAttackCooldown <= 0 && attackSpeed > 0;
     }
     

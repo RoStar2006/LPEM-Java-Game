@@ -71,7 +71,7 @@ public class Turret extends UpdatedBlock {
         statsManager.update(deltaTime);
         
         if(enemy != null) {
-            while(statsManager.offCooldown() && consumeShot()) {
+            while(statsManager.isOffCooldown() && consumeShot()) {
                 statsManager.shoot();
                 
                 if(projectileCount > 1 || (projectileCount == 1 && spread == 0)) {
