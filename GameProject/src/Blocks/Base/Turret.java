@@ -46,7 +46,11 @@ public class Turret extends UpdatedBlock {
     }
     
     protected final void initTower(Class<? extends Projectile> pClass, double attackSpeed, double projectileDelay, double range, double spread, double projectileCount) {
-        statsManager.init(1, attackSpeed);
+        initTower(pClass, 1, attackSpeed, projectileDelay, range, spread, projectileCount);
+    }
+    
+    protected final void initTower(Class<? extends Projectile> pClass, double damage, double attackSpeed, double projectileDelay, double range, double spread, double projectileCount) {
+        statsManager.init(damage, attackSpeed);
         this.pClass = pClass;
         this.range = range;
         this.spread = spread/2;
@@ -75,11 +79,11 @@ public class Turret extends UpdatedBlock {
                 statsManager.shoot();
                 
                 if(projectileCount > 1 || (projectileCount == 1 && spread == 0)) {
-                    double curSpread = -spread;
+                    int spreadIndex = -(int)projectileCount/2;
                     
                     for(double i = 0; i < projectileCount; i++) {
-                        shoot(world, enemy, curSpread, i*projectileDelay);
-                        curSpread += spreadStep;
+                        shoot(world, enemy, spreadIndex*spreadStep, i*projectileDelay);
+                        spreadIndex++;
                     }
                 } else if(projectileCount == 1 && spread != 0) {
                     double randomSpread = Utils.nextDouble(-spread, spread);
