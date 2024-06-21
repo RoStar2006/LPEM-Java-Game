@@ -5,6 +5,7 @@
 package Menus;
 
 import Blocks.Base.*;
+import Blocks.Base.Generator;
 import Blocks.Misc.Storage;
 import Core.MainLogic;
 import Items.Inventory;
@@ -59,6 +60,10 @@ public class DetailsMenu {
         }
         
         if(block instanceof UpdatedBlock updatedBlock) {
+            if(updatedBlock.getRequiredEnergy() > 0) {
+                alDetailsString.add(addNumber("Required Energy:", updatedBlock.getRequiredEnergy()));
+            }
+            
             if(updatedBlock.hasInventory()) {
                 alDetailsString.add("<title>Items");
                 alDetailsString.add("Item Capacity:" + updatedBlock.getMaxStackSize() + " items");
@@ -94,6 +99,9 @@ public class DetailsMenu {
             
             if(updatedBlock instanceof RecipeBlock recipeBlock) {
                 alDetailsString.add("<title>Input/Output");
+                if(recipeBlock instanceof Generator generator) {
+                    alDetailsString.add(addNumber("Energy generated:", generator.getRawGeneratedEnergy()));
+                }
                 ArrayList<String> alRecipeDetails = recipeBlock.formattedRecipeDetails();
                 for(String str : alRecipeDetails) {
                     if(str.contains("<itemIcon>")) {

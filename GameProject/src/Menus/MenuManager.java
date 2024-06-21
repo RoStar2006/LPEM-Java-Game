@@ -153,6 +153,9 @@ public class MenuManager {
         drawHoveredBlock(g);
         drawBuildMenu(g);
         
+        g.setColor(Color.WHITE);
+        g.drawString("Available Energy: " + world.getAvailableEnergy(), 0, MainLogic.SCREEN_RES.y);
+        
         if(detailsMenu != null) {
             detailsMenu.draw(g);
         }

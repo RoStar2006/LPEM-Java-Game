@@ -24,6 +24,7 @@ public abstract class UpdatedBlock extends Block {
     private long delayedDrawID;
     private Point direction = null;
     private boolean exitArrowStyle = true;
+    private double requiredEnergy = 0;
     
     public UpdatedBlock(int x, int y) {
         super(x, y);
@@ -148,6 +149,10 @@ public abstract class UpdatedBlock extends Block {
             inventory.addWhitelist(itemType);
         }
     }
+
+    protected void setRequiredEnergy(double requiredEnergy) {
+        this.requiredEnergy = requiredEnergy;
+    }
     
     public int getMaxStackSize() {
         return inventory.getMaxStackSize();
@@ -155,6 +160,10 @@ public abstract class UpdatedBlock extends Block {
     
     public int getMaxSize() {
         return inventory.getMaxSize();
+    }
+
+    public double getRequiredEnergy() {
+        return requiredEnergy;
     }
     
     /**

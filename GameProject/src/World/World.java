@@ -11,6 +11,7 @@ import Blocks.Base.Node;
 import Blocks.Base.NodeCollector;
 import Blocks.Base.RecipeBlock;
 import Blocks.Base.UpdatedBlock;
+import Blocks.Base.Generator;
 import Core.Camera;
 import Enemies.Base.EnemyManager;
 import Enemies.Base.SpawnRegion;
@@ -59,11 +60,14 @@ public class World {
     private EnemyManager enemyManager;
     private ProjectileManager projectileManager;
     private Core core;
+    private ArrayList<Generator> alGenerators;
+    private double availableEnergy = 0;
 
     public World(int xSize, int ySize, HashMap<Point, Node> hmNodes, ArrayList<SpawnRegion> alSpawnRegions, EnemyManager enemyManager, ProjectileManager projectileManager) {
         this.hmNodes = hmNodes;
         this.alBlocks = new ArrayList<>();
         this.alUpdateBlocks = new ArrayList<>();
+        this.alGenerators = new ArrayList<>();
         this.alSpawnRegions = new ArrayList<>();
         this.alPlannedBlocks = new ArrayList<>();
         this.alSpawnRegions = alSpawnRegions;
@@ -135,15 +139,34 @@ public class World {
      * @param deltaTime
      */
     public void updateBlocks(double deltaTime) {
+        double totalEnergyProduced = 0;
+        
+        for(int i = alGenerators.size()-1; i >= 0; i--) {
+            Generator generator = alGenerators.get(i);
+            
+            if(generator == null || generator.isDeleted()) {
+                alGenerators.remove(i);
+            } else {
+                totalEnergyProduced += generator.getGeneratedEnergy();
+            }
+        }
+        
+        double tempAvailableEnergy = totalEnergyProduced;
+        
         for(int i = alUpdateBlocks.size()-1; i >= 0; i--) {
             UpdatedBlock updatedBlock = alUpdateBlocks.get(i);
             
             if(updatedBlock == null || updatedBlock.isDeleted()) {
                 alUpdateBlocks.remove(i);
             } else if(updatedBlock.isActive()) {
-                updatedBlock.update(deltaTime, this);
+                if(updatedBlock.getRequiredEnergy() <= tempAvailableEnergy) {
+                    updatedBlock.update(deltaTime, this);
+                    tempAvailableEnergy -= updatedBlock.getRequiredEnergy();
+                }
             }
         }
+        
+        availableEnergy = tempAvailableEnergy;
     }
     
     /**
@@ -154,9 +177,6 @@ public class World {
     public void placeBlock(Block block, boolean forcePlace) {
         boolean areaFree = isAreaFree(block);
         if(areaFree || isReplacable(block)) { // If area is free or replacable
-            if(block instanceof UpdatedBlock updatedBlock) {
-                alUpdateBlocks.add(updatedBlock);
-            }
             boolean canPlace = true;
             
             if(!forcePlace) {
@@ -188,6 +208,13 @@ public class World {
 
                 if(block instanceof NodeCollector nodeCollector) {
                     nodeCollector.setNode(getNode(block.getX(), block.getY()));
+                }
+                
+                if(block instanceof UpdatedBlock updatedBlock) {
+                    alUpdateBlocks.add(updatedBlock);
+                    if(updatedBlock instanceof Generator generator) {
+                        alGenerators.add(generator);
+                    }
                 }
             }
         }
@@ -362,6 +389,10 @@ public class World {
 
     public Core getCore() {
         return core;
+    }
+
+    public double getAvailableEnergy() {
+        return availableEnergy;
     }
 
     public EnemyManager getEnemyManager() {
