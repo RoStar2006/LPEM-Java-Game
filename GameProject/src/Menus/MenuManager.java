@@ -122,7 +122,9 @@ public class MenuManager {
                         continue;
                     }
                     
+                    
                     if(!(block instanceof Node node)) {
+                        block.setPreview(true);
                         if(block.getBlockType() != BlockType.None) {
                             createdBlock = true;
                             hmBuildingBlocks.get(block.getBlockType()).add(block);
@@ -154,7 +156,7 @@ public class MenuManager {
         drawBuildMenu(g);
         
         g.setColor(Color.WHITE);
-        g.drawString("Available Energy: " + world.getAvailableEnergy(), 0, MainLogic.SCREEN_RES.y);
+        g.drawString("Available Energy: " + world.getAvailableEnergy(), 5, MainLogic.SCREEN_RES.y-5);
         
         if(detailsMenu != null) {
             detailsMenu.draw(g);

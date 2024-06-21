@@ -47,6 +47,8 @@ public class Block {
     private Polygon polygon = new Polygon();
     private Point polygonCenter = new Point();
     
+    private boolean preview = false;
+    
     public Block(int x, int y) {
         this.x = x;
         this.y = y;
@@ -364,5 +366,13 @@ public class Block {
 
     public BlockType getBlockType() {
         return blockType;
+    }
+
+    protected boolean isPreview() {
+        return preview;
+    }
+
+    public void setPreview(boolean preview) {
+        this.preview = preview;
     }
 }

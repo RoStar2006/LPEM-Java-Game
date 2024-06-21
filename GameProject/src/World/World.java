@@ -162,6 +162,9 @@ public class World {
                 if(updatedBlock.getRequiredEnergy() <= tempAvailableEnergy) {
                     updatedBlock.update(deltaTime, this);
                     tempAvailableEnergy -= updatedBlock.getRequiredEnergy();
+                    updatedBlock.setHasEnergy(true);
+                } else {
+                    updatedBlock.setHasEnergy(false);
                 }
             }
         }

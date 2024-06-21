@@ -44,6 +44,7 @@ public class MainLogic {
     private ArrayList<Block> alBorder = new ArrayList<>();
     
     private static double curConveyorAnim = 0;
+    private static double curEnergyAnim = 0;
 
     /**
      * @param screenRes This is needed to center the camera to the middle of the screen
@@ -88,11 +89,16 @@ public class MainLogic {
     
     private void updateGame(double deltaTime) {
         curConveyorAnim += deltaTime;
+        curEnergyAnim += deltaTime;
         worldManager.update(deltaTime);
     }
 
     public static double getCurConveyorAnim() {
         return curConveyorAnim;
+    }
+
+    public static double getCurEnergyAnim() {
+        return curEnergyAnim;
     }
     
     /**

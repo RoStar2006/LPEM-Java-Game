@@ -9,10 +9,13 @@ import Items.Inventory;
 import Core.MainLogic;
 import Items.ItemType;
 import World.World;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Stroke;
 import java.util.HashMap;
 
 /**
@@ -25,6 +28,8 @@ public abstract class UpdatedBlock extends Block {
     private Point direction = null;
     private boolean exitArrowStyle = true;
     private double requiredEnergy = 0;
+    private boolean hasEnergy = false;
+    private final double energyAnimDelay = 1; // seconds
     
     public UpdatedBlock(int x, int y) {
         super(x, y);
@@ -54,6 +59,19 @@ public abstract class UpdatedBlock extends Block {
             Polygon polygon = getTriangle(x, y, width, height, isExitArrowStyle(), getDirAngle());
             g.setColor(Color.RED);
             g.fillPolygon(polygon);
+        }
+        
+        if(requiredEnergy > 0 && !hasEnergy && !isPreview()) {
+            int thickness = width/4;
+            if(MainLogic.getCurEnergyAnim()%(energyAnimDelay*2) <= energyAnimDelay) {
+                g.setColor(Color.RED);
+            } else {
+                g.setColor(Color.YELLOW);
+            }
+            g.fillRect(x, y, thickness, height);
+            g.fillRect(x, y, width, thickness);
+            g.fillRect(x+width-thickness, y, thickness, height);
+            g.fillRect(x, y+height-thickness, width, thickness);
         }
     }
     
@@ -164,6 +182,10 @@ public abstract class UpdatedBlock extends Block {
 
     public double getRequiredEnergy() {
         return requiredEnergy;
+    }
+
+    public void setHasEnergy(boolean hasEnergy) {
+        this.hasEnergy = hasEnergy;
     }
     
     /**

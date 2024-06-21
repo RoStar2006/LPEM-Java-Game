@@ -4,9 +4,6 @@
  */
 package Blocks.Base;
 
-import Blocks.Base.BlockType;
-import Blocks.Base.RecipeBlock;
-import Blocks.Base.UpdatedBlock;
 import Items.ItemType;
 import World.World;
 import java.awt.Color;
@@ -36,7 +33,7 @@ public class Generator extends RecipeBlock {
 
     @Override
     public void update(double deltaTime, World world) {
-        updateCrafting(deltaTime);
+        updateCrafting(deltaTime, true);
         isProducing = getCurCooldown() > 0;
     }
 

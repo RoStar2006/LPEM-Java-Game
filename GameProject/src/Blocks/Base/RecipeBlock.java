@@ -37,7 +37,7 @@ public class RecipeBlock extends UpdatedBlock {
     
     @Override
     public void update(double deltaTime, World world) {
-        updateCrafting(deltaTime);
+        updateCrafting(deltaTime, false);
         
         // Distribute result items
         UpdatedBlock updatedBlock = getInputBlock(world, getDirection().x, getDirection().y);
@@ -49,10 +49,22 @@ public class RecipeBlock extends UpdatedBlock {
         }
     }
     
-    protected void updateCrafting(double deltaTime) {
+    /**
+     * This method updates the crafting cooldown and crafts the items if possible
+     * @param deltaTime
+     * @param updateAndCheck 
+     * If this value is true, then it updated the cooldown and checks if it can craft, else it has to wait for the next cycle
+     */
+    protected void updateCrafting(double deltaTime, boolean updateAndCheck) {
+        boolean ready;
         if(curCooldown > 0) {
             curCooldown -= deltaTime;
+            ready = curCooldown <= 0;
         } else {
+            ready = true;
+        }
+        
+        if(ready) {
             for(Recipe recipe : alRecipes) {                
                 boolean crafted = false;
                 
