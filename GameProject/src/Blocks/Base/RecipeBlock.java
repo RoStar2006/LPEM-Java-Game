@@ -37,6 +37,19 @@ public class RecipeBlock extends UpdatedBlock {
     
     @Override
     public void update(double deltaTime, World world) {
+        updateCrafting(deltaTime);
+        
+        // Distribute result items
+        UpdatedBlock updatedBlock = getInputBlock(world, getDirection().x, getDirection().y);
+        if(!getResultInventory().isEmpty() && updatedBlock != null) { // Check if any items needs to be transported and a receiving block is available
+            for(Map.Entry<ItemType, Integer> entry : getResultInventory().entrySet()) {
+                int newQuantity = updatedBlock.addItem(entry.getKey(), entry.getValue(), this);
+                getRawResultInventory().removeItem(entry.getKey(), entry.getValue()-newQuantity);
+            }
+        }
+    }
+    
+    protected void updateCrafting(double deltaTime) {
         if(curCooldown > 0) {
             curCooldown -= deltaTime;
         } else {
@@ -51,15 +64,6 @@ public class RecipeBlock extends UpdatedBlock {
                 if(crafted) {
                     break;
                 }
-            }
-        }
-        
-        // Distribute result items
-        UpdatedBlock updatedBlock = getInputBlock(world, getDirection().x, getDirection().y);
-        if(!getResultInventory().isEmpty() && updatedBlock != null) { // Check if any items needs to be transported and a receiving block is available
-            for(Map.Entry<ItemType, Integer> entry : getResultInventory().entrySet()) {
-                int newQuantity = updatedBlock.addItem(entry.getKey(), entry.getValue(), this);
-                getRawResultInventory().removeItem(entry.getKey(), entry.getValue()-newQuantity);
             }
         }
     }
@@ -111,6 +115,10 @@ public class RecipeBlock extends UpdatedBlock {
     public HashMap<ItemType, Integer> getResultInventory() {
         return resultInventory.getHmItems();
     }
+
+    protected double getCurCooldown() {
+        return curCooldown;
+    }
     
     public final ArrayList<String> formattedRecipeDetails() {
         ArrayList<String> strArr = new ArrayList<>();
@@ -119,15 +127,25 @@ public class RecipeBlock extends UpdatedBlock {
             strArr.add("<offset>0.5");
             String[] neededArr = recipe.formattedNeededItems(true);
             String[] cratedArr = recipe.formattedCraftedItems(true);
-            
-            strArr.add("<box>" + (3+cratedArr.length+neededArr.length));
-            strArr.add("Input:");
-            for(String str : neededArr) {
-                strArr.add("<tab>" + str);
+            int boxSize = 1+cratedArr.length+neededArr.length;
+            if(neededArr.length > 0) {
+                boxSize++;
             }
-            strArr.add("Output:");
-            for(String str : cratedArr) {
-                strArr.add("<tab>" + str);
+            if(cratedArr.length > 0) {
+                boxSize++;
+            }
+            strArr.add("<box>" + boxSize);
+            if(neededArr.length > 0) {
+                strArr.add("Input:");
+                for(String str : neededArr) {
+                    strArr.add("<tab>" + str);
+                }
+            }
+            if(cratedArr.length > 0) {
+                strArr.add("Output:");
+                for(String str : cratedArr) {
+                    strArr.add("<tab>" + str);
+                }
             }
             strArr.add("Time:" + recipe.getDuration() + " seconds");
         }
