@@ -10,9 +10,10 @@ package Blocks.Base;
  */
 public enum BlockType {
     None,
-    ItemLogistic,
+    Wall,
+    Tower,
     NodeCollector,
     RecipeBlock,
-    Wall,
-    Tower
+    ItemLogistic,
+    Misc
 }

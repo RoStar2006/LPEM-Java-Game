@@ -19,6 +19,7 @@ public class BlockTypeDrawer {
             case RecipeBlock -> drawBlockIcon(g, x, y, size, Color.ORANGE, Color.WHITE);
             case Wall -> drawBlockIcon(g, x, y, size, Color.BLUE, Color.WHITE);
             case Tower -> drawBlockIcon(g, x, y, size, Color.YELLOW, Color.WHITE);
+            case Misc -> drawBlockIcon(g, x, y, size, Color.GREEN, Color.WHITE);
             default -> drawBlockIcon(g, x, y, size, Color.WHITE, Color.BLACK);
         }
     }

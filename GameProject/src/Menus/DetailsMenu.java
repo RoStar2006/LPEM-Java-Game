@@ -5,7 +5,7 @@
 package Menus;
 
 import Blocks.Base.*;
-import Blocks.Logistics.Storage;
+import Blocks.Misc.Storage;
 import Core.MainLogic;
 import Items.Inventory;
 import Items.ItemDrawer;

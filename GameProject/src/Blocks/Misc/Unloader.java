@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Blocks.Logistics;
+package Blocks.Misc;
 
 import Blocks.Base.Block;
 import Blocks.Base.BlockType;
@@ -28,8 +28,8 @@ public class Unloader extends UpdatedBlock {
     
     public Unloader(int x, int y) {
         super(x, y);
-        initBlock("Unloader", 0.5, 25, 1, 1, Color.MAGENTA, Color.ORANGE);
-        setBlockType(BlockType.ItemLogistic);
+        initBlock("Unloader", 0.5, 25, 1, 1, Color.GREEN, Color.ORANGE);
+        setBlockType(BlockType.Misc);
         setReplacable(false);
         setDirection(new Point(0, -1));
         setExitArrowStyle(false);

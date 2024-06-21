@@ -42,7 +42,7 @@ public class MenuManager {
     private final int bPadding = 3;
     private final int bPaddedIconSize = bIconSize + bPadding;
     private final int bXItemCount = 4;
-    private final int bYItemCount = 5;
+    private final int bYItemCount = 6;
     private final int bFontSize = 16;
     private int scroll = 0;
     
