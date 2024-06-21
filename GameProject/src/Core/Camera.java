@@ -275,8 +275,15 @@ public class Camera {
     }
     
     public boolean isOnScreen(double x, double y, double w, double h) {
-        return x + w >= cX-cRDX && x <= cX+cRDX && 
-               y + h >= cY-cRDY && y <= cY+cRDY;
+        return isOnScreen(x, y, w, h, true);
+    }
+    
+    public boolean isOnScreen(double x, double y, double w, double h, boolean fullyVisible) {
+        if(fullyVisible) {
+            return x + w >= cX-cRDX && x <= cX+cRDX && y + h >= cY-cRDY && y <= cY+cRDY;
+        } else {
+            return x >= cX-cRDX  && x <= cX+cRDX && y >= cY-cRDY && y <= cY+cRDY;
+        }
     }
 
     public double getDrawDeltaTime() {
@@ -337,7 +344,7 @@ public class Camera {
      * @param y2 
      */
     public void drawLine(double x1, double y1, double x2, double y2) {
-        if(isOnScreen(x1, y1, x2 - x1, y2 - y1)) {
+        if(isOnScreen(x1, y1, x2 - x1, y2 - y1, false)) {
             g.drawLine(worldToScreenPosX(x1), worldToScreenPosY(y1), worldToScreenPosX(x2), worldToScreenPosY(y2));
             drawCount++;
         }
@@ -353,7 +360,7 @@ public class Camera {
      * @param color 
      */
     public void drawLine(double x1, double y1, double x2, double y2, Color color) {
-        if(isOnScreen(x1, y1, x2 - x1, y2 - y1)) {
+        if(isOnScreen(x1, y1, x2 - x1, y2 - y1, false)) {
             setColor(color);
             g.drawLine(worldToScreenPosX(x1), worldToScreenPosY(y1), worldToScreenPosX(x2), worldToScreenPosY(y2));
             drawCount++;
@@ -371,7 +378,7 @@ public class Camera {
      * @param color 
      */
     public void drawLine(double x1, double y1, double x2, double y2, double thickness, Color color) {
-        if(isOnScreen(x1, y1, x2 - x1, y2 - y1)) {
+        if(isOnScreen(x1, y1, x2 - x1, y2 - y1, false)) {
             setColor(color);
             Graphics2D g2d = (Graphics2D)g;
             Stroke oldThickness = g2d.getStroke();
