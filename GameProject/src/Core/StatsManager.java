@@ -168,7 +168,7 @@ public class StatsManager {
     }
     
     public boolean showDamage() {
-        return (System.currentTimeMillis() - lastDamageTime) < damageDisplaySpan;
+        return (System.currentTimeMillis() - lastDamageTime) < damageDisplaySpan && health < maxHealth;
     }
 
     public double getAttackRate() {
