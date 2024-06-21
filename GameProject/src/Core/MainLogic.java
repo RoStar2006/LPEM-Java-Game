@@ -105,7 +105,7 @@ public class MainLogic {
         
         worldManager.draw(camera, g);
         
-        camera.drawCamera();
+        // camera.drawCamera();
     }
     
     private void drawBackground(Graphics g) {

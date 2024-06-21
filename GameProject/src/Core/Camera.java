@@ -28,7 +28,7 @@ public class Camera {
     private final double minZoom = 0.5;
     private final double maxZoom = 2;
     private final double zoomStep = 0.25;
-    private final int speed = 200; // px/s
+    private final int speed = 400; // px/s
     private final double renderDistanceX, renderDistanceY;
     private final double fontRatio = WorldManager.FONT_SIZE / (double)WorldManager.BLOCK_SIZE;
     
