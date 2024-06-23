@@ -23,6 +23,10 @@ public class MainLogic {
     public static Point SCREEN_RES;
     private long seed = 1;
     public final static double GAME_SPEED = 2;
+    private boolean paused = false;
+    
+    private final int worldSizeX = 256;
+    private final int worldSizeY = 256;
     
     private Camera camera;
     private Controls controls;
@@ -38,10 +42,8 @@ public class MainLogic {
     /*
         World border stuff
     */
-    private final int borderSpacing = 17;
     private final Color voidColor = new Color(22, 15, 30);
-    private final Color borderColor = new Color(60, 45, 67, 255/borderSpacing);
-    private ArrayList<Block> alBorder = new ArrayList<>();
+    private final Color borderColor = new Color(31, 22, 38);
     
     private static double curConveyorAnim = 0;
     private static double curEnergyAnim = 0;
@@ -50,18 +52,16 @@ public class MainLogic {
      * @param screenRes This is needed to center the camera to the middle of the screen
      */
     public MainLogic(Point screenRes) {
-        this.SCREEN_RES = screenRes;
+        MainLogic.SCREEN_RES = screenRes;
         lastTime = System.nanoTime();
         
         camera = new Camera(screenRes.x/2, screenRes.y/2);
-        menuManager = new MenuManager(camera);
+        menuManager = new MenuManager(this, camera);
         controls = new Controls(camera, menuManager);
         
         worldManager = new WorldManager(menuManager);
-        worldManager.generateWorld(seed, 256, 256);
+        worldManager.generateWorld(seed, worldSizeX, worldSizeY);
         camera.setPos(worldManager.getCore().getX()+1.5, worldManager.getCore().getY()+1.5);
-        
-        generateBorder();
     }
     
     /**
@@ -90,7 +90,9 @@ public class MainLogic {
     private void updateGame(double deltaTime) {
         curConveyorAnim += deltaTime;
         curEnergyAnim += deltaTime;
-        worldManager.update(deltaTime);
+        if(!paused) {
+            worldManager.update(deltaTime);
+        }
     }
 
     public static double getCurConveyorAnim() {
@@ -118,22 +120,7 @@ public class MainLogic {
         g.setColor(voidColor);
         g.fillRect(0, 0, SCREEN_RES.x, SCREEN_RES.y);
         
-        for(Block border : alBorder) {
-            border.draw(camera);
-        }
-    }
-    
-    /**
-     * Generates the border around the game world.
-     * This only needs to be called, when a new world is generated
-     */
-    private void generateBorder() {
-        alBorder = new ArrayList<>();
-        
-        /*for(int i = 1; i <= borderSpacing; i++) {
-            alBorder.add(new Block(-i, -borderSpacing+i-1, WorldManager.WORLD_SIZE_X+i*2, WorldManager.WORLD_SIZE_Y+(borderSpacing-i+1)*2, borderColor));
-        }*/
-        System.err.println("Disabled world border generation");
+        camera.fillRect(0, 0, worldSizeX, worldSizeY, borderColor);
     }
     
     public static double getDeltaTime() {
@@ -142,5 +129,13 @@ public class MainLogic {
 
     public Controls getControls() {
         return controls;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void togglePaused() {
+        this.paused = !paused;
     }
 }

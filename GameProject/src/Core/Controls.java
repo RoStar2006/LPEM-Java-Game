@@ -39,6 +39,11 @@ public class Controls {
             case KeyEvent.VK_S -> camera.changeDir(1, !released);
             case KeyEvent.VK_A -> camera.changeDir(2, !released);
             case KeyEvent.VK_D -> camera.changeDir(3, !released);
+            case KeyEvent.VK_ESCAPE -> {
+                if(!released) {
+                    menuManager.togglePause();
+                }
+            }
         }
     }
     

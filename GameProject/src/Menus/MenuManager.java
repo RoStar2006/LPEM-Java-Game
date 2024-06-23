@@ -33,7 +33,9 @@ import java.util.Map;
 public class MenuManager {
     private World world;
     private Camera c;
+    private MainLogic mainLogic;
     private InventoryMenu inventoryMenu;
+    private DetailsMenu detailsMenu;
     
     /*
         Build menu
@@ -78,10 +80,9 @@ public class MenuManager {
     private Point removeStartPoint;
     private boolean rotatedBlock;
     
-    private DetailsMenu detailsMenu;
-    
-    public MenuManager(Camera camera) {
+    public MenuManager(MainLogic mainLogic, Camera camera) {
         this.c = camera;
+        this.mainLogic = mainLogic;
         
         initBuildingBlocks();
     }
@@ -160,6 +161,16 @@ public class MenuManager {
         
         if(detailsMenu != null) {
             detailsMenu.draw(g);
+        }
+        
+        if(mainLogic.isPaused()) {
+            g.setColor(bgDarkColor);
+            g.fillRect(0, 0, MainLogic.SCREEN_RES.x, MainLogic.SCREEN_RES.y);
+            g.setColor(Color.WHITE);
+            Font oldFont = g.getFont();
+            g.setFont(oldFont.deriveFont(48f));
+            g.drawString("Paused", (MainLogic.SCREEN_RES.x-g.getFontMetrics().stringWidth("Paused"))/2, (MainLogic.SCREEN_RES.y+g.getFont().getSize())/2);
+            g.setFont(oldFont);
         }
     }
     
@@ -356,7 +367,7 @@ public class MenuManager {
     }
     
     public boolean canInteract() {
-        return detailsMenu == null;
+        return detailsMenu == null && !mainLogic.isPaused();
     }
     
     public void mouseClickInput(int x, int y, boolean leftClick, boolean released) {
@@ -465,4 +476,7 @@ public class MenuManager {
         return true;
     }
     
+    public void togglePause() {
+        mainLogic.togglePaused();
+    }
 }
