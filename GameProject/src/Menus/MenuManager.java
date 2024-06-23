@@ -453,7 +453,11 @@ public class MenuManager {
     }
     
     public boolean mouseWheelInput(MouseWheelEvent evt) {
-        if(!canInteract()) {
+        if(detailsMenu != null) {
+            detailsMenu.scroll((int)Math.signum(-evt.getWheelRotation()));
+            
+            return true;
+        } else if(!canInteract()) {
             return false;
         }
         

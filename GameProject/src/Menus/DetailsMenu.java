@@ -8,6 +8,7 @@ import Blocks.Base.*;
 import Blocks.Base.Generator;
 import Blocks.Misc.Storage;
 import Core.MainLogic;
+import Core.Utils;
 import Items.Inventory;
 import Items.ItemDrawer;
 import java.awt.Color;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 public class DetailsMenu {
     private Block block;
     private Color bgColor;
+    private int menuHeight;
     private final Color boxColor = new Color(16, 16, 16);
     private final Color textColor = Color.WHITE;
     private final Color attributeColor = Color.LIGHT_GRAY;
@@ -33,6 +35,10 @@ public class DetailsMenu {
     private final int closeButtonY = MainLogic.SCREEN_RES.y - closeButtonHeight*2;
     private final ArrayList<String> alDetailsString = new ArrayList<>();
     private final ArrayList<Node> alNodes;
+    
+    private final int scrollAmount = (int)fontSize;
+    private int scroll = 0;
+    private int menuScrollOffset = 0;
     
     public DetailsMenu(Block block, ArrayList<Node> alNodes, Color bgColor) {
         this.bgColor = bgColor;
@@ -123,13 +129,24 @@ public class DetailsMenu {
                 }
             }
         } 
+        
+        menuHeight = 0;
+        for(String str : alDetailsString) {
+            if(str.contains("<offset>")) {
+                String tempStr = str.replaceAll("<offset>", "");
+                menuHeight += fontSize * Double.parseDouble(tempStr);
+            } else {
+                menuHeight += fontSize;
+            }
+        }
+        menuScrollOffset = (int)(Math.floor((MainLogic.SCREEN_RES.y-menuHeight)/(double)scrollAmount)*scrollAmount);
     }
     
     public final static String addNumber(String str, double number) {
         if(number % 1 <= 0.1) {
             str += (int)number;
         } else {
-            str += number;
+            str += Math.round(number*100.0)/100.0;
         }
         
         return str;
@@ -147,7 +164,11 @@ public class DetailsMenu {
         Font oldFont = g.getFont();
         g.setFont(oldFont.deriveFont(fontSize));
         
-        int lY = MainLogic.SCREEN_RES.y/4;
+        int lY = Utils.clampInt(MainLogic.SCREEN_RES.y/2-menuHeight/2, (int)(fontSize*2), closeButtonY);
+        if(menuScrollOffset < 0) {
+            lY = Utils.clampInt(lY+scroll*scrollAmount, menuScrollOffset,(int)(fontSize*2));
+        }
+                
         int lX = MainLogic.SCREEN_RES.x/2-closeButtonWidth;
         String tabSpaces = "    ";
         int whiteSpaceWidth = g.getFontMetrics().stringWidth(" ");
@@ -240,6 +261,8 @@ public class DetailsMenu {
         g.setColor(boxColor);
         g.fillRect(closeButtonX, closeButtonY, closeButtonWidth, closeButtonHeight);
         g.setColor(attributeColor);
+        g.drawRect(closeButtonX, closeButtonY, closeButtonWidth, closeButtonHeight);
+        g.setColor(textColor);
         Font oldFont = g.getFont();
         g.setFont(oldFont.deriveFont(32f));
         g.drawString("Close", closeButtonX+(closeButtonWidth-g.getFontMetrics().stringWidth("Close"))/2, closeButtonY+(closeButtonHeight+g.getFont().getSize()/3*2)/2);
@@ -248,5 +271,9 @@ public class DetailsMenu {
     
     public boolean onCloseButton(int x, int y) {
         return x >= closeButtonX && y >= closeButtonY && x <= closeButtonX+closeButtonWidth && y <= closeButtonY+closeButtonHeight;
+    }
+    
+    public void scroll(int amount) {
+        scroll = Utils.clampInt(scroll+amount, 0, menuScrollOffset/scrollAmount-2); // -2 for font size offset from bottom
     }
 }

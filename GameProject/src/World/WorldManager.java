@@ -88,7 +88,9 @@ public class WorldManager {
         enemyManager.draw(c);
         menuManager.draw(g);
         
-        drawWaveTimer(g);
+        if(menuManager.canInteract()) {
+            drawWaveTimer(g);
+        }
     }
     
     private void drawWaveTimer(Graphics g) {
