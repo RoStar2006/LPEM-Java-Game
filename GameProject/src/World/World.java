@@ -13,6 +13,7 @@ import Blocks.Base.RecipeBlock;
 import Blocks.Base.UpdatedBlock;
 import Blocks.Base.Generator;
 import Core.Camera;
+import Core.MainLogic;
 import Enemies.Base.EnemyManager;
 import Enemies.Base.SpawnRegion;
 import Items.ItemType;
@@ -28,6 +29,7 @@ import java.util.Map;
  * @author Romeo
  */
 public class World {
+    private MainLogic mainLogic;
     /**
      * The resource nodes contained in the world, they are accessed with world coordiantes.
      */
@@ -63,7 +65,8 @@ public class World {
     private ArrayList<Generator> alGenerators;
     private double availableEnergy = 0;
 
-    public World(int xSize, int ySize, HashMap<Point, Node> hmNodes, ArrayList<SpawnRegion> alSpawnRegions, EnemyManager enemyManager, ProjectileManager projectileManager) {
+    public World(int xSize, int ySize, HashMap<Point, Node> hmNodes, ArrayList<SpawnRegion> alSpawnRegions, MainLogic mainLogic, EnemyManager enemyManager, ProjectileManager projectileManager) {
+        this.mainLogic = mainLogic;
         this.hmNodes = hmNodes;
         this.alBlocks = new ArrayList<>();
         this.alUpdateBlocks = new ArrayList<>();
@@ -256,7 +259,7 @@ public class World {
         if(block != null) {
             if(block.equals(core)) {
                 if(!playerRemove) {
-                    System.out.println("Lost");
+                    mainLogic.gameOver();
                 }
                 return false;
             }

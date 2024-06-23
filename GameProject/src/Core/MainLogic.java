@@ -1,13 +1,11 @@
 package Core;
 
 
-import Blocks.Base.Block;
 import Menus.MenuManager;
 import World.WorldManager;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.util.ArrayList;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -24,6 +22,7 @@ public class MainLogic {
     private long seed = 1;
     public final static double GAME_SPEED = 2;
     private boolean paused = false;
+    private boolean gameOver = false;
     
     private final int worldSizeX = 256;
     private final int worldSizeY = 256;
@@ -60,8 +59,8 @@ public class MainLogic {
         controls = new Controls(camera, menuManager);
         
         worldManager = new WorldManager(menuManager);
-        worldManager.generateWorld(seed, worldSizeX, worldSizeY);
-        camera.setPos(worldManager.getCore().getX()+1.5, worldManager.getCore().getY()+1.5);
+        worldManager.generateWorld(this, seed, worldSizeX, worldSizeY);
+        camera.setPos(worldManager.getCore().getX()+worldManager.getCore().getWidth()/2.0, worldManager.getCore().getY()+worldManager.getCore().getHeight()/2.0);
     }
     
     /**
@@ -82,7 +81,7 @@ public class MainLogic {
             updateGame(deltaTime*speed);
         }
         
-        if(menuManager.canInteract()) {
+        if(menuManager.canInteract() || gameOver) {
             camera.move();
         }
     }
@@ -90,7 +89,7 @@ public class MainLogic {
     private void updateGame(double deltaTime) {
         curConveyorAnim += deltaTime;
         curEnergyAnim += deltaTime;
-        if(!paused) {
+        if(!paused && !gameOver) {
             worldManager.update(deltaTime);
         }
     }
@@ -136,6 +135,16 @@ public class MainLogic {
     }
 
     public void togglePaused() {
-        this.paused = !paused;
+        if(!gameOver) {
+            this.paused = !paused;
+        }
+    }
+    
+    public void gameOver() {
+        gameOver = true;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
     }
 }

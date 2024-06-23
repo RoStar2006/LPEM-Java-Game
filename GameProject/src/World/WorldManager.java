@@ -49,8 +49,8 @@ public class WorldManager {
     private final static Class[] paramTypesSub = { int.class, int.class }; // The costructor template for the node creation
     private ArrayList<Class<? extends Node>> alNodeClasses = new ArrayList<>();
     
-    private double nextWave = 1; // seconds
-    private double waveDelay = 120; // seconds
+    private double nextWave = 180; // seconds
+    private double waveDelay = 150; // seconds
 
     public WorldManager(MenuManager menuManager) {
         this.menuManager = menuManager;
@@ -112,7 +112,7 @@ public class WorldManager {
         return world.getCore();
     }
     
-    public void generateWorld(long seed, int xSize, int ySize) {
+    public void generateWorld(MainLogic mainLogic, long seed, int xSize, int ySize) {
         Utils.initRandom(seed);
         WORLD_SIZE_X = xSize;
         WORLD_SIZE_Y = ySize;
@@ -122,7 +122,7 @@ public class WorldManager {
         enemyManager = new EnemyManager();
         projectileManager = new ProjectileManager();
         
-        world = new World(xSize, ySize, hmNodes, alSpawnRegions, enemyManager, projectileManager);
+        world = new World(xSize, ySize, hmNodes, alSpawnRegions, mainLogic, enemyManager, projectileManager);
         buildManager = new BuildManager(world);
         menuManager.init(buildManager, world);
         

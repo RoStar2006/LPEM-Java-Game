@@ -163,13 +163,17 @@ public class MenuManager {
             detailsMenu.draw(g);
         }
         
-        if(mainLogic.isPaused()) {
+        if(mainLogic.isPaused() || mainLogic.isGameOver()) {
             g.setColor(bgDarkColor);
             g.fillRect(0, 0, MainLogic.SCREEN_RES.x, MainLogic.SCREEN_RES.y);
             g.setColor(Color.WHITE);
             Font oldFont = g.getFont();
             g.setFont(oldFont.deriveFont(48f));
-            g.drawString("Paused", (MainLogic.SCREEN_RES.x-g.getFontMetrics().stringWidth("Paused"))/2, (MainLogic.SCREEN_RES.y+g.getFont().getSize())/2);
+            if(mainLogic.isPaused()) {
+                g.drawString("Paused", (MainLogic.SCREEN_RES.x-g.getFontMetrics().stringWidth("Paused"))/2, (MainLogic.SCREEN_RES.y+g.getFont().getSize())/2);
+            } else {
+                g.drawString("Game Over", (MainLogic.SCREEN_RES.x-g.getFontMetrics().stringWidth("Game Over"))/2, (MainLogic.SCREEN_RES.y+g.getFont().getSize())/2);
+            }
             g.setFont(oldFont);
         }
     }
@@ -367,7 +371,7 @@ public class MenuManager {
     }
     
     public boolean canInteract() {
-        return detailsMenu == null && !mainLogic.isPaused();
+        return detailsMenu == null && !mainLogic.isPaused() && !mainLogic.isGameOver();
     }
     
     public void mouseClickInput(int x, int y, boolean leftClick, boolean released) {
@@ -450,7 +454,7 @@ public class MenuManager {
     
     public boolean mouseWheelInput(MouseWheelEvent evt) {
         if(!canInteract()) {
-            return true;
+            return false;
         }
         
         int x = evt.getX();
