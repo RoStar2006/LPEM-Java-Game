@@ -147,6 +147,10 @@ public abstract class UpdatedBlock extends Block {
         inventory = new Inventory(maxStackSize, maxSize, outputOnly);
     }
     
+    protected void deleteInventory() {
+        inventory = null;
+    }
+    
     protected void setMaxStackSize(int maxStackSize) {
         if(inventory != null) {
             inventory.setMaxStackSize(maxStackSize);

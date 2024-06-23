@@ -161,6 +161,10 @@ public class Block {
         }
     }
     
+    protected void resetNeededItems() {
+        hmNeededItems.clear();
+    }
+    
     public final boolean updateBuildProgress(int state, double deltaTime) {
         if(state == 0) {
             buildAnimPerc -= deltaTime / buildTime;

@@ -23,7 +23,9 @@ public class OverflowGate extends UpdatedBlock {
         setBlockType(BlockType.ItemLogistic);
         createInventory(0, 0, false);
         initBlock("Overflow Gate", 0.1, 25, 1, 1, Color.MAGENTA, Color.YELLOW);
-        addNeededItem(ItemType.CopperIngot, 5);
+        addNeededItem(ItemType.CopperSheet, 4);
+        addNeededItem(ItemType.IronRod, 4);
+        addNeededItem(ItemType.CircuitBoard, 1);
     }
 
     @Override

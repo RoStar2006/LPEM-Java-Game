@@ -67,7 +67,7 @@ public class DetailsMenu {
         
         if(block instanceof UpdatedBlock updatedBlock) {
             if(updatedBlock.getRequiredEnergy() > 0) {
-                alDetailsString.add(addNumber("Required Energy:", updatedBlock.getRequiredEnergy()));
+                alDetailsString.add(addNumber("Required Energy:", updatedBlock.getRequiredEnergy()) + "/second");
             }
             
             if(updatedBlock.hasInventory()) {
@@ -106,7 +106,7 @@ public class DetailsMenu {
             if(updatedBlock instanceof RecipeBlock recipeBlock) {
                 alDetailsString.add("<title>Input/Output");
                 if(recipeBlock instanceof Generator generator) {
-                    alDetailsString.add(addNumber("Energy generated:", generator.getRawGeneratedEnergy()));
+                    alDetailsString.add(addNumber("Energy generated:", generator.getRawGeneratedEnergy()) + "/second");
                 }
                 ArrayList<String> alRecipeDetails = recipeBlock.formattedRecipeDetails();
                 for(String str : alRecipeDetails) {
@@ -139,7 +139,7 @@ public class DetailsMenu {
                 menuHeight += fontSize;
             }
         }
-        menuScrollOffset = (int)(Math.floor((MainLogic.SCREEN_RES.y-menuHeight)/(double)scrollAmount)*scrollAmount);
+        menuScrollOffset = (int)(Math.ceil((closeButtonY-menuHeight+3*fontSize)/(double)scrollAmount)*scrollAmount);
     }
     
     public final static String addNumber(String str, double number) {
@@ -274,6 +274,6 @@ public class DetailsMenu {
     }
     
     public void scroll(int amount) {
-        scroll = Utils.clampInt(scroll+amount, 0, menuScrollOffset/scrollAmount-2); // -2 for font size offset from bottom
+        scroll = Utils.clampInt(scroll+amount, 0, menuScrollOffset/scrollAmount);
     }
 }

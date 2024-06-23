@@ -5,6 +5,7 @@
 package Blocks.Production.Miners;
 
 import Blocks.Base.NodeCollector;
+import Blocks.Nodes.CoalNode;
 import Blocks.Nodes.CopperNode;
 import Blocks.Nodes.IronNode;
 import Items.ItemType;
@@ -19,11 +20,13 @@ public class MinerMK2 extends NodeCollector {
     public MinerMK2(int x, int y) {
         super(x, y);
         initBlock("Miner MK2", 1, 175, 1, 1, Color.RED, new Color(255, 255, 170));
-        setMiningSpeed(120);
+        setMiningSpeed(150);
         addNeededItem(ItemType.CopperIngot, 25);
         addNeededItem(ItemType.IronIngot, 35);
+        resetAllowedNodes();
         addAllowedNode(IronNode.class);
         addAllowedNode(CopperNode.class);
+        addAllowedNode(CoalNode.class);
     }
     
 }

@@ -21,9 +21,10 @@ public class Storage extends UpdatedBlock {
         initBlock("Storage", 1.5, 250, 2, 2, Color.GREEN, Color.PINK);
         setBlockType(BlockType.Misc);
         setReplacable(false);
-        createInventory(200, -1, false);
-        addNeededItem(ItemType.CopperIngot, 25);
-        addNeededItem(ItemType.IronIngot, 25);
+        createInventory(400, -1, false);
+        addNeededItem(ItemType.IronSheet, 25);
+        addNeededItem(ItemType.IronRod, 30);
+        addNeededItem(ItemType.Screws, 25);
     }
 
     @Override

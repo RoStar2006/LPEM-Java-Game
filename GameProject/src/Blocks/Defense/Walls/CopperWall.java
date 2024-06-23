@@ -19,6 +19,6 @@ public class CopperWall extends Block {
         super(x, y);
         setBlockType(BlockType.Wall);
         initBlock("Copper Wall", 0.75, 300, 1, 1, Color.BLUE, Color.ORANGE);
-        addNeededItem(ItemType.CopperOre, 5);
+        addNeededItem(ItemType.CopperIngot, 3);
     }
 }

@@ -20,12 +20,12 @@ import java.awt.Point;
 public class MainLogic {
     public static Point SCREEN_RES;
     private long seed = 1;
-    public final static double GAME_SPEED = 2;
+    public final static double GAME_SPEED = 1;
     private boolean paused = false;
     private boolean gameOver = false;
     
-    private final int worldSizeX = 256;
-    private final int worldSizeY = 256;
+    private final int worldSizeX = 512;
+    private final int worldSizeY = 512;
     
     private Camera camera;
     private Controls controls;

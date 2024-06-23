@@ -17,10 +17,13 @@ public class Mono extends Turret {
     
     public Mono(int x, int y) {
         super(x, y);
-        initBlock("Mono", 1, 300, 1, 1, Color.YELLOW, Color.LIGHT_GRAY);
-        initTower(Projectile.class, 1, 0, 15, 0, 1);
+        initBlock("Mono", 1, 250, 1, 1, Color.YELLOW, Color.LIGHT_GRAY);
+        initTower(Projectile.class, 1, 0, 12, 0, 1);
+        addNeededItem(ItemType.IronIngot, 10);
         addProjectileCost(ItemType.IronOre, 1, 3);
         addProjectileCost(ItemType.CopperOre, 1, 2);
+        addProjectileCost(ItemType.Ammo, 1, 6);
+        addProjectileCost(ItemType.AdvancedAmmo, 1, 10);
     }
     
 }

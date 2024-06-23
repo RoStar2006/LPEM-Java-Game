@@ -16,7 +16,7 @@ public class MeleeEnemy extends Enemy {
     
     public MeleeEnemy(double x, double y, Core core) {
         super(x, y, core);
-        initEnemy(15, 1, 1, 1, 7, 0.75, Color.RED);
+        initEnemy(15, 1, 1, 0.5, 7, 0.75, Color.RED);
         initWeight(50, 1);
     }
     

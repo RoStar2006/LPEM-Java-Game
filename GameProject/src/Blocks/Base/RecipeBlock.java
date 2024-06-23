@@ -104,6 +104,16 @@ public class RecipeBlock extends UpdatedBlock {
     }
     
     /**
+     * 
+     * @param modifier This modifier is multiplicative.
+     */
+    protected void modifyAllRecipeDuration(double modifier) {
+        for(Recipe recipe : alRecipes) {
+            recipe.modifyDuration(modifier);
+        }
+    }
+    
+    /**
      * Sort from biggest recipe to smallest
      */
     private void sortRecipes() {
@@ -130,6 +140,10 @@ public class RecipeBlock extends UpdatedBlock {
 
     protected double getCurCooldown() {
         return curCooldown;
+    }
+    
+    public int getRecipesCount() {
+        return alRecipes.size();
     }
     
     public final ArrayList<String> formattedRecipeDetails() {

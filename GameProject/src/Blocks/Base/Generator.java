@@ -34,7 +34,7 @@ public class Generator extends RecipeBlock {
     @Override
     public void update(double deltaTime, World world) {
         updateCrafting(deltaTime, true);
-        isProducing = getCurCooldown() > 0;
+        isProducing = getCurCooldown() > 0 || getRecipesCount() == 0;
     }
 
     public double getGeneratedEnergy() {

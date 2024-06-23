@@ -79,7 +79,7 @@ public class ConveyorBelt extends UpdatedBlock {
     public void delayedDraw(Camera c, World world) {
         drawConveyorLines(c, world);
         
-        double size = 0.25;
+        double size = 0.33;
         double cX = x+width/2.0;
         double cY = y+height/2.0;
         

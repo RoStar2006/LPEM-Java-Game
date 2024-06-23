@@ -33,8 +33,9 @@ public class Unloader extends UpdatedBlock {
         setReplacable(false);
         setDirection(new Point(0, -1));
         setExitArrowStyle(false);
-        addNeededItem(ItemType.CopperIngot, 5);
-        addNeededItem(ItemType.IronIngot, 5);
+        addNeededItem(ItemType.CopperSheet, 4);
+        addNeededItem(ItemType.IronRod, 4);
+        addNeededItem(ItemType.CircuitBoard, 1);
     }
 
     @Override

@@ -17,7 +17,7 @@ public class ConveyorBeltMK1 extends ConveyorBelt {
     public ConveyorBeltMK1(int x, int y) {
         super(x, y);
         initBlock("Copper Conveyor", 0.01, 20, 1, 1, Color.MAGENTA, Color.GREEN);
-        setTravelSpeed(120);
+        setTravelSpeed(270);
         addNeededItem(ItemType.CopperOre, 1);
     }
     

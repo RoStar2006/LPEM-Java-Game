@@ -24,7 +24,7 @@ public class Trail extends Projectile {
     @Override
     public void draw(Camera c) {
         c.drawLine(getTrailStartX()+getTrailOffsetX(), getTrailStartY()+getTrailOffsetY(), x-getTrailOffsetX(), y-getTrailOffsetY(), getTrailWidth()/3, coreColor);
-        c.drawLine(getTrailStartX(), getTrailStartY(), x, y, getTrailWidth(), trailColor);
+        // c.drawLine(getTrailStartX(), getTrailStartY(), x, y, getTrailWidth(), trailColor);
     }
     
 }

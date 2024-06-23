@@ -44,6 +44,10 @@ public class Recipe {
     public int getSize() {
         return hmNeeded.size();
     }
+    
+    public void modifyDuration(double modifier) {
+        duration *= modifier;
+    }
 
     public double getDuration() {
         return duration;

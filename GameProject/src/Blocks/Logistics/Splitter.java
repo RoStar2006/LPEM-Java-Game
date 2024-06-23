@@ -30,10 +30,11 @@ public class Splitter extends UpdatedBlock {
         super(x, y);
         setDirection(new Point(0, -1));
         setExitArrowStyle(false);
-        initBlock("Splitter", 0.15, 20, 1, 1, Color.MAGENTA, Color.DARK_GRAY);
-        addNeededItem(ItemType.CopperIngot, 5);
         setBlockType(BlockType.ItemLogistic);
+        initBlock("Splitter", 0.15, 20, 1, 1, Color.MAGENTA, Color.DARK_GRAY);
         createInventory(1, 1, false);
+        addNeededItem(ItemType.CopperSheet, 4);
+        addNeededItem(ItemType.IronRod, 4);
     }
 
     @Override

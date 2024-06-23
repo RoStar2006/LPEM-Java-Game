@@ -8,6 +8,7 @@ import Blocks.Base.Block;
 import Blocks.Base.BlockType;
 import Blocks.Base.UpdatedBlock;
 import Core.Camera;
+import Items.ItemType;
 import World.World;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
  * @author RupRo053
  */
 public class Healer extends UpdatedBlock {
-    private final int range = 5;
+    private int range = 5;
     private final double maxCooldown = 3;
     private double cooldown = 0;
     ArrayList<Block> alHealedBlock = new ArrayList<>();
@@ -27,6 +28,9 @@ public class Healer extends UpdatedBlock {
         setBlockType(BlockType.Misc);
         initBlock("Healer", 1, 125, 1, 1, Color.GREEN, Color.YELLOW);
         setRequiredEnergy(0.5);
+        addNeededItem(ItemType.CircuitBoard, 25);
+        addNeededItem(ItemType.IronSheet, 15);
+        addNeededItem(ItemType.Screws, 10);
     }
     
     @Override
@@ -53,6 +57,10 @@ public class Healer extends UpdatedBlock {
     @Override
     public void drawHovered(Camera c) {
         c.drawRect(x-range, y-range, range*2+1, range*2+1, Color.WHITE);
+    }
+    
+    protected void setRange(int range) {
+        this.range = range;
     }
     
 }

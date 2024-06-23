@@ -19,7 +19,7 @@ public class IronWallBig extends Block {
         super(x, y);
         setBlockType(BlockType.Wall);
         initBlock("Big Iron Wall", 4, 2000, 2, 2, Color.BLUE, Color.LIGHT_GRAY);
-        addNeededItem(ItemType.IronIngot, 20);
+        addNeededItem(ItemType.IronIngot, 15);
     }
     
 }
