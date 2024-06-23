@@ -59,7 +59,7 @@ public class Recipe {
                 if(value%1 == 0) {
                     result[i] += " ~" + (int)value + "/second";
                 } else {
-                    result[i] += " ~" + value + "/second";
+                    result[i] += " ~" + Math.round(value*100.0)/100.0 + "/second";
                 }
                 i++;
             }
@@ -78,7 +78,7 @@ public class Recipe {
                 if(value%1 == 0) {
                     result[i] += " ~" + (int)value + "/second";
                 } else {
-                    result[i] += " ~" + value + "/second";
+                    result[i] += " ~" + Math.round(value*100.0)/100.0 + "/second";
                 }
                 i++;
             }
