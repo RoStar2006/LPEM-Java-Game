@@ -23,7 +23,7 @@ public class Junction extends UpdatedBlock {
         setBlockType(BlockType.ItemLogistic);
         createInventory(0, 0, false);
         initBlock("Junction", 0.1, 25, 1, 1, Color.MAGENTA, Color.CYAN);
-        addNeededItem(ItemType.CopperSheet, 4);
+        addNeededItem(ItemType.CopperIngot, 4);
     }
 
     @Override

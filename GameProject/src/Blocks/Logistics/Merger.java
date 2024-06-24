@@ -23,8 +23,8 @@ public class Merger extends UpdatedBlock {
         initBlock("Merger", 0.15, 20, 1, 1, Color.MAGENTA, Color.LIGHT_GRAY);
         setBlockType(BlockType.ItemLogistic);
         createInventory(1, 1, false);
-        addNeededItem(ItemType.CopperSheet, 4);
-        addNeededItem(ItemType.IronRod, 4);
+        addNeededItem(ItemType.CopperIngot, 4);
+        addNeededItem(ItemType.IronIngot, 4);
     }
 
     @Override
